@@ -1,0 +1,149 @@
+{
+  "info": {
+    "_postman_id": "8f45f33b-3125-49fa-965c-4cd69076ec81",
+    "name": "Auctionary - Week 1 User System",
+    "description": "Registration, validation, login, public profile and authenticated logout checks for Auctionary API 1.0.0.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (!pm.collectionVariables.get('testEmail')) {",
+          "  pm.collectionVariables.set('testEmail', `week1.${Date.now()}@example.com`);",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3333" },
+    { "key": "testEmail", "value": "" },
+    { "key": "testPassword", "value": "GrooveGavel9!" },
+    { "key": "userId", "value": "" },
+    { "key": "sessionToken", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "01 Register valid user",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"first_name\": \"Ada\",\n  \"last_name\": \"Lovelace\",\n  \"email\": \"{{testEmail}}\",\n  \"password\": \"{{testPassword}}\"\n}" },
+        "url": "{{baseUrl}}/users"
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('Created (201)', () => pm.response.to.have.status(201));",
+        "const body = pm.response.json();",
+        "pm.expect(body).to.have.property('user_id');",
+        "pm.collectionVariables.set('userId', body.user_id);"
+      ] } }]
+    },
+    {
+      "name": "02 Reject duplicate email",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"first_name\": \"Ada\",\n  \"last_name\": \"Lovelace\",\n  \"email\": \"{{testEmail}}\",\n  \"password\": \"{{testPassword}}\"\n}" },
+        "url": "{{baseUrl}}/users"
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('Bad Request (400)', () => pm.response.to.have.status(400));",
+        "pm.expect(pm.response.json()).to.have.property('error_message');"
+      ] } }]
+    },
+    {
+      "name": "03 Reject missing field",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"last_name\": \"Lovelace\",\n  \"email\": \"missing@example.com\",\n  \"password\": \"{{testPassword}}\"\n}" },
+        "url": "{{baseUrl}}/users"
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('Bad Request (400)', () => pm.response.to.have.status(400));"] } }]
+    },
+    {
+      "name": "04 Reject invalid email",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"first_name\": \"Ada\",\n  \"last_name\": \"Lovelace\",\n  \"email\": \"not-an-email\",\n  \"password\": \"{{testPassword}}\"\n}" },
+        "url": "{{baseUrl}}/users"
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('Bad Request (400)', () => pm.response.to.have.status(400));"] } }]
+    },
+    {
+      "name": "05 Reject weak password",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"first_name\": \"Ada\",\n  \"last_name\": \"Lovelace\",\n  \"email\": \"weak@example.com\",\n  \"password\": \"password\"\n}" },
+        "url": "{{baseUrl}}/users"
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('Bad Request (400)', () => pm.response.to.have.status(400));"] } }]
+    },
+    {
+      "name": "06 Reject incomplete login",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{testEmail}}\"\n}" },
+        "url": "{{baseUrl}}/login"
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('Bad Request (400)', () => pm.response.to.have.status(400));"] } }]
+    },
+    {
+      "name": "07 Reject invalid credentials",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{testEmail}}\",\n  \"password\": \"WrongPassword9!\"\n}" },
+        "url": "{{baseUrl}}/login"
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('Bad Request (400)', () => pm.response.to.have.status(400));"] } }]
+    },
+    {
+      "name": "08 Login",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{testEmail}}\",\n  \"password\": \"{{testPassword}}\"\n}" },
+        "url": "{{baseUrl}}/login"
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('OK (200)', () => pm.response.to.have.status(200));",
+        "const body = pm.response.json();",
+        "pm.expect(body).to.have.keys('user_id', 'session_token');",
+        "pm.collectionVariables.set('sessionToken', body.session_token);"
+      ] } }]
+    },
+    {
+      "name": "09 Get user profile",
+      "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/users/{{userId}}" },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('OK (200)', () => pm.response.to.have.status(200));",
+        "pm.expect(pm.response.json()).to.include.keys('user_id', 'first_name', 'last_name', 'selling', 'bidding_on', 'auctions_ended');"
+      ] } }]
+    },
+    {
+      "name": "10 Reject invalid logout token",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "X-Authorization", "value": "invalid-token" }],
+        "url": "{{baseUrl}}/logout"
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('Unauthorised (401)', () => pm.response.to.have.status(401));"] } }]
+    },
+    {
+      "name": "11 Authenticated logout",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "X-Authorization", "value": "{{sessionToken}}" }],
+        "url": "{{baseUrl}}/logout"
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('OK (200)', () => pm.response.to.have.status(200));"] } }]
+    }
+  ]
+}

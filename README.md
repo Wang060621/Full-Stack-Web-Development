@@ -22,3 +22,23 @@ Once you have completed the above, you are set up and ready to begin work on the
 If you have any issues and questions, please let me know.
 
 Xia
+
+## Week 1 implementation
+
+The user-management API is implemented under `app/`:
+
+- `POST /users` - register a user
+- `POST /login` - create or reuse a session token
+- `POST /logout` - invalidate a session token
+- `GET /users/:user_id` - retrieve a public user profile
+
+Run the backend and checks in separate terminals:
+
+```text
+npm run dev
+npm run wipe
+npm test
+```
+
+Project planning artifacts are in `docs/`. The Postman collection is in
+`postman/Auctionary-Week-1.postman_collection.json`.
