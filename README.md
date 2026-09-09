@@ -23,14 +23,19 @@ If you have any issues and questions, please let me know.
 
 Xia
 
-## Week 1 implementation
+## Backend implementation
 
-The user-management API is implemented under `app/`:
+The complete base Auctionary API is implemented under `app/`:
 
 - `POST /users` - register a user
 - `POST /login` - create or reuse a session token
 - `POST /logout` - invalidate a session token
 - `GET /users/:user_id` - retrieve a public user profile
+- `POST /item` and `GET /item/:item_id` - create and view auctions
+- `POST /item/:item_id/bid` and `GET /item/:item_id/bid` - place and view bids
+- `POST /item/:item_id/question`, `POST /question/:question_id`, and
+  `GET /item/:item_id/question` - ask, answer, and view questions
+- `GET /search` - search and filter auctions with pagination
 
 Run the backend and checks in separate terminals:
 
@@ -40,5 +45,5 @@ npm run wipe
 npm test
 ```
 
-Project planning artifacts are in `docs/`. The Postman collection is in
+Project planning and verification notes are in `docs/`. The Postman collection is in
 `postman/Auctionary-Week-1.postman_collection.json`.

@@ -29,9 +29,8 @@ app.get('/', (req, res, next) => {
 
 // API endpoints
 require('./app/routes/user.server.routes')(app);
-// The remaining route groups are implemented in later assignment weeks.
-// require('./app/routes/core.server.routes')(app);
-// require('./app/routes/question.server.routes')(app);
+require('./app/routes/core.server.routes')(app);
+require('./app/routes/question.server.routes')(app);
 
 
 // Default response for any other request
