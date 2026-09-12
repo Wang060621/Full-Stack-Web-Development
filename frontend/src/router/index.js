@@ -13,16 +13,21 @@ const router = createRouter({
   history: createWebHistory(),
   scrollBehavior: () => ({ top: 0 }),
   routes: [
-    { path: '/', name: 'marketplace', component: MarketplaceView },
-    { path: '/login', name: 'login', component: LoginView, meta: { guestOnly: true } },
-    { path: '/register', name: 'register', component: RegisterView, meta: { guestOnly: true } },
-    { path: '/welcome', name: 'welcome', component: WelcomeView, meta: { requiresAuth: true } },
-    { path: '/profile/:id?', name: 'profile', component: ProfileView },
-    { path: '/items/new', name: 'item-new', component: ItemFormView, meta: { requiresAuth: true } },
-    { path: '/items/:id/edit', name: 'item-edit', component: ItemFormView, meta: { requiresAuth: true } },
-    { path: '/items/:id', name: 'item-detail', component: ItemDetailView },
+    { path: '/', name: 'marketplace', component: MarketplaceView, meta: { title: 'Marketplace' } },
+    { path: '/login', name: 'login', component: LoginView, meta: { guestOnly: true, title: 'Sign in' } },
+    { path: '/register', name: 'register', component: RegisterView, meta: { guestOnly: true, title: 'Create account' } },
+    { path: '/welcome', name: 'welcome', component: WelcomeView, meta: { requiresAuth: true, title: 'Welcome' } },
+    { path: '/profile/:id?', name: 'profile', component: ProfileView, meta: { title: 'Profile' } },
+    { path: '/items/new', name: 'item-new', component: ItemFormView, meta: { requiresAuth: true, title: 'List a record' } },
+    { path: '/items/:id/edit', name: 'item-edit', component: ItemFormView, meta: { requiresAuth: true, title: 'Review lot' } },
+    { path: '/items/:id', name: 'item-detail', component: ItemDetailView, meta: { title: 'Lot details' } },
     { path: '/:pathMatch(.*)*', name: 'not-found', component: NotFoundView }
   ]
+});
+
+router.afterEach((to) => {
+  document.title = `${to.meta.title || 'Page not found'} · GrooveGavel`;
+  window.requestAnimationFrame(() => document.querySelector('#main-content')?.focus());
 });
 
 router.beforeEach((to) => {

@@ -1,5 +1,7 @@
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3333';
 
+let authenticationFailureHandler = null;
+
 export class ApiError extends Error {
   constructor(message, status) {
     super(message);
@@ -8,7 +10,11 @@ export class ApiError extends Error {
   }
 }
 
-export async function apiRequest(path, { method = 'GET', body, token, signal } = {}) {
+export function onAuthenticationFailure(handler) {
+  authenticationFailureHandler = handler;
+}
+
+export async function apiRequest(path, { method = 'GET', body, token, signal, ignoreAuthenticationFailure = false } = {}) {
   const headers = { Accept: 'application/json' };
   if (body !== undefined) headers['Content-Type'] = 'application/json';
   if (token) headers['X-Authorization'] = token;
@@ -27,11 +33,20 @@ export async function apiRequest(path, { method = 'GET', body, token, signal } =
   }
 
   const contentType = response.headers.get('content-type') || '';
-  const payload = contentType.includes('application/json')
-    ? await response.json()
-    : null;
+  let payload = null;
+  if (contentType.includes('application/json')) {
+    try {
+      payload = await response.json();
+    } catch {
+      if (response.ok) throw new ApiError('The auction service returned an unreadable response.', response.status);
+    }
+  }
 
   if (!response.ok) {
+    if (response.status === 401 && token && !ignoreAuthenticationFailure) {
+      authenticationFailureHandler?.();
+      throw new ApiError('Your session has expired. Sign in again to continue.', 401);
+    }
     throw new ApiError(payload?.error_message || `Request failed (${response.status})`, response.status);
   }
   return payload;

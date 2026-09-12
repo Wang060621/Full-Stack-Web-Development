@@ -12,7 +12,7 @@ body { margin: 0; min-width: 320px; min-height: 100vh; background: var(--cream);
 button, input, textarea { font-family: Arial, Helvetica, sans-serif; }
 a { color: var(--violet); }
 button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible {
-  outline: 3px solid rgba(245,158,11,.6); outline-offset: 3px;
+  outline: 3px solid #fff1bd; outline-offset: 2px; box-shadow: 0 0 0 5px #1e1713;
 }
 button:disabled { cursor: not-allowed; opacity: .55; }
 .app-shell { display: flex; min-height: 100vh; flex-direction: column; }
@@ -20,6 +20,14 @@ main { flex: 1; }
 .page-width { width: min(1180px, calc(100% - 2rem)); margin-inline: auto; }
 .skip-link { position: fixed; top: .5rem; left: .5rem; z-index: 100; transform: translateY(-160%); padding: .65rem 1rem; border-radius: .35rem; color: white; background: var(--violet-dark); }
 .skip-link:focus { transform: translateY(0); }
+.session-alert {
+  display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: .65rem 1rem;
+  padding: .75rem 1rem; color: #fff8e8; background: #6b1f2a; font-family: Arial, Helvetica, sans-serif;
+}
+.session-alert a { color: #fff1bd; font-weight: 800; }
+.session-alert button { border: 1px solid #e5bd6e; border-radius: .35rem; padding: .35rem .65rem; color: white; background: transparent; cursor: pointer; }
+#main-content:focus { outline: none; }
+.global-notice { margin-top: 1rem; }
 .site-header {
   position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between;
   gap: 2rem; min-height: 76px; padding: .85rem clamp(1rem,5vw,5rem); color: white;
@@ -99,13 +107,15 @@ h2 { margin: 0; line-height: 1.2; }
 .form-card textarea, .question-form textarea { resize: vertical; }
 .form-card input:disabled, .form-card textarea:disabled { color: #59515f; background: #f0ece4; }
 .form-card small { color: var(--muted); font-size: .8rem; font-weight: 500; }
-.form-card .password-warning {
+.form-card .password-risk {
   padding: .55rem .7rem;
-  border-left: 3px solid #b67a22;
-  color: #70470f;
-  background: #fff4d8;
+  border-left: 3px solid currentColor;
   font-weight: 700;
 }
+.password-risk.risk-high { color: #7f1d1d; background: #fff1f2; }
+.password-risk.risk-medium { color: #70470f; background: #fff4d8; }
+.password-risk.risk-low { color: #28513b; background: #edf7ef; }
+.password-risk.risk-very-low { color: #17452d; background: #e5f6eb; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: .9rem; }
 .profile-page, .editor-page, .detail-page { padding: 3.5rem 0 5rem; }
 .profile-header { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 1.2rem; padding-bottom: 2.25rem; border-bottom: 1px solid var(--line); }

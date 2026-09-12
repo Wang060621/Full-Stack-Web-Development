@@ -27,6 +27,9 @@ async function loadItem() {
   error.value = '';
   try {
     const id = route.params.id;
+    if (!/^\d+$/.test(String(id)) || Number(id) < 1) {
+      throw new Error('Choose a valid auction lot.');
+    }
     const [itemResult, bidResult, questionResult] = await Promise.all([
       apiRequest(`/item/${id}`),
       apiRequest(`/item/${id}/bid`),
@@ -44,9 +47,10 @@ async function loadItem() {
 }
 
 async function submitBid() {
+  if (action.type) return;
   action.error = ''; action.success = '';
   const amount = Number(bidAmount.value);
-  if (!Number.isFinite(amount)) action.error = 'Enter a valid bid amount.';
+  if (!Number.isSafeInteger(amount)) action.error = 'Enter a whole-number bid amount.';
   else if (amount < minimumBid.value) action.error = `Enter a bid of at least ${formatCurrency(minimumBid.value)}.`;
   if (action.error) return;
 
@@ -65,6 +69,7 @@ async function submitBid() {
 }
 
 async function submitQuestion() {
+  if (action.type) return;
   action.error = ''; action.success = '';
   if (!questionText.value) {
     action.error = 'Enter a question for the seller.';
@@ -86,6 +91,7 @@ async function submitQuestion() {
 }
 
 async function submitAnswer(questionId) {
+  if (action.type) return;
   action.error = ''; action.success = '';
   if (!answers[questionId]?.trim()) {
     action.error = 'Enter an answer before submitting.';
@@ -138,7 +144,7 @@ watch(() => route.params.id, loadItem);
           </p>
 
           <StatusPanel v-if="action.error" type="error" title="Action not completed" :message="action.error" />
-          <StatusPanel v-if="action.success" class="bid-accepted" type="success" title="Bid accepted" :message="action.success" />
+          <StatusPanel v-if="action.success" class="bid-accepted" type="success" title="Action completed" :message="action.success" />
 
           <form
             v-if="authStore.isAuthenticated && !isSeller && !auctionClosed"

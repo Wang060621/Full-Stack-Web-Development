@@ -34,12 +34,15 @@ async function loadItem() {
 }
 
 async function submit() {
+  if (submitting.value) return;
   if (editing.value) return;
   error.value = '';
   if (!form.name) error.value = 'Enter the record name.';
   else if (!form.description) error.value = 'Enter a description for the record.';
   else if (!Number.isFinite(Number(form.starting_bid)) || Number(form.starting_bid) < 0) {
     error.value = 'Enter a starting bid of zero or more.';
+  } else if (!Number.isSafeInteger(Number(form.starting_bid))) {
+    error.value = 'Enter a whole-number starting bid.';
   } else if (!form.end_date || !Number.isFinite(new Date(form.end_date).getTime())) {
     error.value = 'Choose a valid auction end date and time.';
   } else if (new Date(form.end_date).getTime() <= Date.now()) {

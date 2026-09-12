@@ -7,7 +7,12 @@ defineProps({
 </script>
 
 <template>
-  <div class="status-panel" :class="`status-${type}`" role="status">
+  <div
+    class="status-panel"
+    :class="`status-${type}`"
+    :role="type === 'error' ? 'alert' : 'status'"
+    :aria-live="type === 'error' ? 'assertive' : 'polite'"
+  >
     <strong>{{ title }}</strong>
     <span v-if="message">{{ message }}</span>
     <slot />

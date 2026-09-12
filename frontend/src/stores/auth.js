@@ -1,5 +1,5 @@
 import { reactive } from 'vue';
-import { apiRequest } from '../services/api';
+import { apiRequest, onAuthenticationFailure } from '../services/api';
 
 const STORAGE_KEY = 'groovegavel.session';
 
@@ -18,6 +18,7 @@ const state = reactive({
   userId: saved.userId,
   token: saved.token,
   profile: null,
+  sessionExpired: false,
   welcomeInvitationPending: false
 });
 
@@ -33,16 +34,20 @@ function setSession(session) {
   state.userId = session.user_id;
   state.token = session.session_token;
   state.profile = null;
+  state.sessionExpired = false;
   persist();
 }
 
-function clearSession() {
+function clearSession({ expired = false } = {}) {
   state.userId = null;
   state.token = '';
   state.profile = null;
+  state.sessionExpired = expired;
   state.welcomeInvitationPending = false;
   persist();
 }
+
+onAuthenticationFailure(() => clearSession({ expired: true }));
 
 export const authStore = {
   state,
@@ -77,10 +82,22 @@ export const authStore = {
   },
   async logout() {
     try {
-      if (state.token) await apiRequest('/logout', { method: 'POST', token: state.token });
+      if (state.token) {
+        await apiRequest('/logout', {
+          method: 'POST',
+          token: state.token,
+          ignoreAuthenticationFailure: true
+        });
+      }
     } finally {
       clearSession();
     }
+  },
+  dismissSessionExpired() {
+    state.sessionExpired = false;
+  },
+  expireSession() {
+    clearSession({ expired: true });
   },
   clear: clearSession
 };

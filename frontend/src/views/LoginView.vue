@@ -12,6 +12,7 @@ const error = ref('');
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 async function submit() {
+  if (submitting.value) return;
   error.value = '';
   if (!form.email) error.value = 'Enter your email address.';
   else if (!emailPattern.test(form.email)) error.value = 'Enter a valid email address.';
@@ -21,6 +22,7 @@ async function submit() {
   submitting.value = true;
   try {
     await authStore.login(form);
+    authStore.dismissSessionExpired();
     const redirect = typeof route.query.redirect === 'string' && route.query.redirect.startsWith('/')
       ? route.query.redirect
       : '/';
@@ -45,6 +47,7 @@ async function submit() {
         <h2>Sign in</h2>
         <p>New here? <RouterLink to="/register">Create an account</RouterLink></p>
       </div>
+      <StatusPanel v-if="route.query.expired === '1' && !error" title="Session expired" message="Sign in again to continue where you left off." />
       <StatusPanel v-if="error" type="error" title="Sign-in failed" :message="error" />
       <label>
         <span>Email</span>

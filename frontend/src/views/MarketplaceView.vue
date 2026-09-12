@@ -1,5 +1,5 @@
 <script setup>
-import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import AuctionCard from '../components/AuctionCard.vue';
 import StatusPanel from '../components/StatusPanel.vue';
 import { apiRequest } from '../services/api';
@@ -24,7 +24,8 @@ const filters = [
 async function loadItems({ reset = false } = {}) {
   if (reset) offset.value = 0;
   controller?.abort();
-  controller = new AbortController();
+  const requestController = new AbortController();
+  controller = requestController;
   loading.value = true;
   error.value = '';
 
@@ -35,12 +36,18 @@ async function loadItems({ reset = false } = {}) {
   try {
     items.value = await apiRequest(`/search?${params}`, {
       token: activeStatus.value ? authStore.state.token : undefined,
-      signal: controller.signal
+      signal: requestController.signal
     });
   } catch (requestError) {
-    if (requestError.name !== 'AbortError') error.value = requestError.message;
+    if (requestError.name !== 'AbortError') {
+      if (activeStatus.value && requestError.status === 400 && /valid session/i.test(requestError.message)) {
+        authStore.expireSession();
+      } else {
+        error.value = requestError.message;
+      }
+    }
   } finally {
-    if (!controller.signal.aborted) loading.value = false;
+    if (controller === requestController && !requestController.signal.aborted) loading.value = false;
   }
 }
 
@@ -56,6 +63,12 @@ function changePage(delta) {
 }
 
 onMounted(loadItems);
+watch(() => authStore.isAuthenticated, (authenticated) => {
+  if (!authenticated && activeStatus.value) {
+    activeStatus.value = '';
+    loadItems({ reset: true });
+  }
+});
 onBeforeUnmount(() => controller?.abort());
 </script>
 
@@ -91,7 +104,7 @@ onBeforeUnmount(() => controller?.abort());
     </div>
 
     <StatusPanel v-if="error" type="error" title="Unable to load auctions" :message="error" />
-    <div v-else-if="loading" class="loading-grid" aria-label="Loading auctions">
+    <div v-else-if="loading" class="loading-grid" role="status" aria-label="Loading auctions">
       <div v-for="index in 3" :key="index" class="skeleton-card" />
     </div>
     <StatusPanel

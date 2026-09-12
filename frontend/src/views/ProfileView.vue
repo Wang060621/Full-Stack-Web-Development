@@ -18,6 +18,11 @@ async function loadProfile() {
   loading.value = true;
   error.value = '';
   profile.value = null;
+  if (!Number.isSafeInteger(requestedId.value) || requestedId.value < 1) {
+    error.value = 'Choose a valid user profile.';
+    loading.value = false;
+    return;
+  }
   try {
     profile.value = await apiRequest(`/users/${requestedId.value}`);
     if (isOwnProfile.value) authStore.state.profile = profile.value;

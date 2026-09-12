@@ -1,13 +1,17 @@
 <script setup>
-import { onBeforeUnmount, ref, watch } from 'vue';
+import { nextTick, onBeforeUnmount, ref, watch } from 'vue';
 import { RouterLink, RouterView, useRouter } from 'vue-router';
+import StatusPanel from './components/StatusPanel.vue';
 import { authStore } from './stores/auth';
 
 const router = useRouter();
 const menuOpen = ref(false);
 const loggingOut = ref(false);
+const logoutNotice = ref('');
 const showIntro = ref(false);
 const introStage = ref('sealed');
+const invitationCard = ref(null);
+const invitationSeal = ref(null);
 let introTimer;
 
 const starlight = Array.from({ length: 72 }, (_, index) => {
@@ -43,7 +47,17 @@ watch(() => authStore.state.welcomeInvitationPending, (pending) => {
   showIntro.value = true;
   introTimer = window.setTimeout(() => {
     introStage.value = 'sealed';
+    nextTick(() => invitationSeal.value?.focus());
   }, 900);
+});
+
+watch(() => authStore.state.sessionExpired, (expired) => {
+  if (!expired || !router.currentRoute.value.meta.requiresAuth) return;
+  authStore.dismissSessionExpired();
+  router.replace({
+    name: 'login',
+    query: { redirect: router.currentRoute.value.fullPath, expired: '1' }
+  });
 });
 
 function openInvitation() {
@@ -51,7 +65,13 @@ function openInvitation() {
   introStage.value = 'opening';
   introTimer = window.setTimeout(() => {
     introStage.value = 'ready';
+    nextTick(() => invitationCard.value?.focus());
   }, 4000);
+}
+
+function keepIntroFocus() {
+  if (introStage.value === 'ready') invitationCard.value?.focus();
+  else if (introStage.value === 'sealed') invitationSeal.value?.focus();
 }
 
 function enterSite() {
@@ -68,11 +88,14 @@ onBeforeUnmount(() => window.clearTimeout(introTimer));
 
 async function logout() {
   loggingOut.value = true;
+  logoutNotice.value = '';
   try {
     await authStore.logout();
+  } catch (error) {
+    logoutNotice.value = `${error.message} You have still been signed out on this device.`;
+  } finally {
     menuOpen.value = false;
     await router.push({ name: 'marketplace' });
-  } finally {
     loggingOut.value = false;
   }
 }
@@ -84,12 +107,15 @@ async function logout() {
         v-if="showIntro"
         :class="['invitation-intro', `intro-${introStage}`]"
         role="dialog"
+        aria-modal="true"
         aria-label="Private invitation"
+        @keydown.tab.prevent="keepIntroFocus"
       >
         <div class="invitation-scene">
           <div class="envelope-shell">
             <span class="envelope-back" />
             <button
+              ref="invitationCard"
               class="invitation-card"
               type="button"
               :disabled="introStage !== 'ready'"
@@ -105,6 +131,7 @@ async function logout() {
             <span class="envelope-pocket" />
             <span class="envelope-flap" />
             <button
+              ref="invitationSeal"
               class="wax-seal"
               type="button"
               :disabled="introStage !== 'sealed'"
@@ -160,7 +187,21 @@ async function logout() {
       </nav>
     </header>
 
-    <main id="main-content">
+    <StatusPanel
+      v-if="logoutNotice"
+      class="global-notice page-width"
+      type="error"
+      title="Sign-out warning"
+      :message="logoutNotice"
+    />
+
+    <div v-if="authStore.state.sessionExpired" class="session-alert" role="alert">
+      <span>Your session has expired. Please sign in again to continue.</span>
+      <RouterLink to="/login" @click="authStore.dismissSessionExpired()">Sign in</RouterLink>
+      <button type="button" aria-label="Dismiss session message" @click="authStore.dismissSessionExpired()">Dismiss</button>
+    </div>
+
+    <main id="main-content" tabindex="-1">
       <RouterView v-slot="{ Component, route }">
         <Transition name="page" mode="out-in">
           <component :is="Component" :key="route.fullPath" />

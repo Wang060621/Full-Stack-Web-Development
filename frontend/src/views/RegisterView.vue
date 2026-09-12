@@ -9,7 +9,26 @@ const form = reactive({ first_name: '', last_name: '', email: '', password: '' }
 const submitting = ref(false);
 const error = ref('');
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const numericPasswordWarning = computed(() => /^\d{8,32}$/.test(form.password));
+
+const passwordRisk = computed(() => {
+  if (!form.password || form.password.length < 8 || form.password.length > 32) return null;
+
+  const categoryCount = [
+    /[a-z]/.test(form.password),
+    /[A-Z]/.test(form.password),
+    /[0-9]/.test(form.password),
+    /[^A-Za-z0-9]/.test(form.password)
+  ].filter(Boolean).length;
+
+  const levels = {
+    1: { className: 'risk-high', label: 'High risk', message: 'Uses only one character type.' },
+    2: { className: 'risk-medium', label: 'Medium-low risk', message: 'Uses two character types.' },
+    3: { className: 'risk-low', label: 'Low risk', message: 'Uses three character types.' },
+    4: { className: 'risk-very-low', label: 'Very low risk', message: 'Uses all four character types.' }
+  };
+
+  return levels[Math.max(categoryCount, 1)];
+});
 
 function validationMessage() {
   if (!form.first_name) return 'Enter your first name.';
@@ -22,6 +41,7 @@ function validationMessage() {
 }
 
 async function submit() {
+  if (submitting.value) return;
   error.value = '';
   error.value = validationMessage();
   if (error.value) return;
@@ -74,12 +94,21 @@ async function submit() {
           autocomplete="new-password"
           minlength="8"
           maxlength="32"
-          :aria-describedby="numericPasswordWarning ? 'password-help password-warning' : 'password-help'"
+          :aria-describedby="passwordRisk ? 'password-help password-risk' : 'password-help'"
           required
         />
-        <small id="password-help">Use 8–32 characters.</small>
-        <small v-if="numericPasswordWarning" id="password-warning" class="password-warning" role="status">
-          Numbers-only passwords are easier to guess. You can still use this password.
+        <small id="password-help">
+          Use 8–32 characters. Uppercase, lowercase, numbers and special characters only affect the risk rating.
+        </small>
+        <small
+          v-if="passwordRisk"
+          id="password-risk"
+          class="password-risk"
+          :class="passwordRisk.className"
+          role="status"
+          aria-live="polite"
+        >
+          <strong>{{ passwordRisk.label }}:</strong> {{ passwordRisk.message }} Registration is still allowed.
         </small>
       </label>
       <button class="primary-button" type="submit" :disabled="submitting">
