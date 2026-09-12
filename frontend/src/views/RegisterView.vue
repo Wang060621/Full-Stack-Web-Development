@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
 import StatusPanel from '../components/StatusPanel.vue';
 import { authStore } from '../stores/auth';
@@ -8,13 +8,29 @@ const router = useRouter();
 const form = reactive({ first_name: '', last_name: '', email: '', password: '' });
 const submitting = ref(false);
 const error = ref('');
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const numericPasswordWarning = computed(() => /^\d{8,32}$/.test(form.password));
+
+function validationMessage() {
+  if (!form.first_name) return 'Enter your first name.';
+  if (!form.last_name) return 'Enter your last name.';
+  if (!form.email) return 'Enter your email address.';
+  if (!emailPattern.test(form.email)) return 'Enter a valid email address.';
+  if (!form.password) return 'Create a password.';
+  if (form.password.length < 8 || form.password.length > 32) return 'Use 8–32 characters.';
+  return '';
+}
 
 async function submit() {
-  submitting.value = true;
   error.value = '';
+  error.value = validationMessage();
+  if (error.value) return;
+
+  submitting.value = true;
   try {
     await authStore.register(form);
-    await router.push(`/profile/${authStore.state.userId}`);
+    authStore.requestWelcomeInvitation();
+    await router.push({ name: 'welcome' });
   } catch (requestError) {
     error.value = requestError.message;
   } finally {
@@ -30,7 +46,7 @@ async function submit() {
       <h1>Help great records find their next collector</h1>
       <p>You will be signed in automatically and can list your first record straight away.</p>
     </div>
-    <form class="form-card" @submit.prevent="submit">
+    <form class="form-card" novalidate @submit.prevent="submit">
       <div class="form-heading">
         <h2>Create account</h2>
         <p>Already registered? <RouterLink to="/login">Sign in</RouterLink></p>
@@ -58,11 +74,13 @@ async function submit() {
           autocomplete="new-password"
           minlength="8"
           maxlength="32"
-          pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,32}"
-          aria-describedby="password-help"
+          :aria-describedby="numericPasswordWarning ? 'password-help password-warning' : 'password-help'"
           required
         />
-        <small id="password-help">Use 8–32 characters with upper and lowercase letters, a number and a special character.</small>
+        <small id="password-help">Use 8–32 characters.</small>
+        <small v-if="numericPasswordWarning" id="password-warning" class="password-warning" role="status">
+          Numbers-only passwords are easier to guess. You can still use this password.
+        </small>
       </label>
       <button class="primary-button" type="submit" :disabled="submitting">
         {{ submitting ? 'Creating account…' : 'Create account and sign in' }}

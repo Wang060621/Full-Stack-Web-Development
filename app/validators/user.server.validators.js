@@ -3,10 +3,6 @@ const Joi = require('joi');
 const password = Joi.string()
     .min(8)
     .max(32)
-    .pattern(/[a-z]/, 'lowercase character')
-    .pattern(/[A-Z]/, 'uppercase character')
-    .pattern(/[0-9]/, 'number')
-    .pattern(/[^A-Za-z0-9]/, 'special character')
     .required();
 
 const createUser = Joi.object({

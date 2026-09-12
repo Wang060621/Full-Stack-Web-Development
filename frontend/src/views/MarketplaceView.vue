@@ -66,7 +66,7 @@ onBeforeUnmount(() => controller?.abort());
         <p class="eyebrow">Rare pressings · Autumn ’92</p>
         <h1>Records worth keeping.</h1>
       </div>
-      <form class="search-bar" role="search" @submit.prevent="loadItems({ reset: true })">
+      <form class="search-bar" role="search" novalidate @submit.prevent="loadItems({ reset: true })">
         <label class="sr-only" for="market-search">Search records</label>
         <input id="market-search" v-model="query" maxlength="100" placeholder="Search by record name" />
         <button type="submit">Search</button>

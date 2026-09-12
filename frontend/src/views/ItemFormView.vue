@@ -35,8 +35,19 @@ async function loadItem() {
 
 async function submit() {
   if (editing.value) return;
-  submitting.value = true;
   error.value = '';
+  if (!form.name) error.value = 'Enter the record name.';
+  else if (!form.description) error.value = 'Enter a description for the record.';
+  else if (!Number.isFinite(Number(form.starting_bid)) || Number(form.starting_bid) < 0) {
+    error.value = 'Enter a starting bid of zero or more.';
+  } else if (!form.end_date || !Number.isFinite(new Date(form.end_date).getTime())) {
+    error.value = 'Choose a valid auction end date and time.';
+  } else if (new Date(form.end_date).getTime() <= Date.now()) {
+    error.value = 'Choose an auction end time in the future.';
+  }
+  if (error.value) return;
+
+  submitting.value = true;
   try {
     const result = await apiRequest('/item', {
       method: 'POST',
@@ -67,7 +78,7 @@ onMounted(loadItem);
       <p v-if="!editing">Describe the pressing, condition and extras so collectors can bid with confidence.</p>
     </div>
     <div v-if="loading" class="page-loader">Loading lot…</div>
-    <form v-else class="form-card editor-form" @submit.prevent="submit">
+    <form v-else class="form-card editor-form" novalidate @submit.prevent="submit">
       <StatusPanel
         v-if="editing"
         type="info"

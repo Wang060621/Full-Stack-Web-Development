@@ -9,10 +9,16 @@ const router = useRouter();
 const form = reactive({ email: String(route.query.email || ''), password: '' });
 const submitting = ref(false);
 const error = ref('');
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 async function submit() {
-  submitting.value = true;
   error.value = '';
+  if (!form.email) error.value = 'Enter your email address.';
+  else if (!emailPattern.test(form.email)) error.value = 'Enter a valid email address.';
+  else if (!form.password) error.value = 'Enter your password.';
+  if (error.value) return;
+
+  submitting.value = true;
   try {
     await authStore.login(form);
     const redirect = typeof route.query.redirect === 'string' && route.query.redirect.startsWith('/')
@@ -34,7 +40,7 @@ async function submit() {
       <h1>Continue your collecting journey</h1>
       <p>Sign in to list records, place bids, ask questions and track your auctions.</p>
     </div>
-    <form class="form-card" @submit.prevent="submit">
+    <form class="form-card" novalidate @submit.prevent="submit">
       <div class="form-heading">
         <h2>Sign in</h2>
         <p>New here? <RouterLink to="/register">Create an account</RouterLink></p>

@@ -1,12 +1,12 @@
 <script setup>
-import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { onBeforeUnmount, ref, watch } from 'vue';
 import { RouterLink, RouterView, useRouter } from 'vue-router';
 import { authStore } from './stores/auth';
 
 const router = useRouter();
 const menuOpen = ref(false);
 const loggingOut = ref(false);
-const showIntro = ref(true);
+const showIntro = ref(false);
 const introStage = ref('sealed');
 let introTimer;
 
@@ -28,10 +28,22 @@ const starlight = Array.from({ length: 72 }, (_, index) => {
   };
 });
 
-onMounted(() => {
+watch(() => authStore.state.welcomeInvitationPending, (pending) => {
+  if (!pending) return;
+
+  window.clearTimeout(introTimer);
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     showIntro.value = false;
+    authStore.consumeWelcomeInvitation();
+    router.replace({ name: 'marketplace' });
+    return;
   }
+
+  introStage.value = 'arriving';
+  showIntro.value = true;
+  introTimer = window.setTimeout(() => {
+    introStage.value = 'sealed';
+  }, 900);
 });
 
 function openInvitation() {
@@ -45,8 +57,10 @@ function openInvitation() {
 function enterSite() {
   if (introStage.value !== 'ready') return;
   introStage.value = 'dispersing';
+  router.replace({ name: 'marketplace' });
   introTimer = window.setTimeout(() => {
     showIntro.value = false;
+    authStore.consumeWelcomeInvitation();
   }, 2600);
 }
 

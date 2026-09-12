@@ -17,7 +17,8 @@ const saved = readSession();
 const state = reactive({
   userId: saved.userId,
   token: saved.token,
-  profile: null
+  profile: null,
+  welcomeInvitationPending: false
 });
 
 function persist() {
@@ -39,6 +40,7 @@ function clearSession() {
   state.userId = null;
   state.token = '';
   state.profile = null;
+  state.welcomeInvitationPending = false;
   persist();
 }
 
@@ -56,6 +58,12 @@ export const authStore = {
     const { user_id } = await apiRequest('/users', { method: 'POST', body: details });
     await this.login({ email: details.email, password: details.password });
     return user_id;
+  },
+  requestWelcomeInvitation() {
+    state.welcomeInvitationPending = true;
+  },
+  consumeWelcomeInvitation() {
+    state.welcomeInvitationPending = false;
   },
   async loadProfile() {
     if (!state.userId) return null;

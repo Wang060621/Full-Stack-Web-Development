@@ -99,6 +99,13 @@ h2 { margin: 0; line-height: 1.2; }
 .form-card textarea, .question-form textarea { resize: vertical; }
 .form-card input:disabled, .form-card textarea:disabled { color: #59515f; background: #f0ece4; }
 .form-card small { color: var(--muted); font-size: .8rem; font-weight: 500; }
+.form-card .password-warning {
+  padding: .55rem .7rem;
+  border-left: 3px solid #b67a22;
+  color: #70470f;
+  background: #fff4d8;
+  font-weight: 700;
+}
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: .9rem; }
 .profile-page, .editor-page, .detail-page { padding: 3.5rem 0 5rem; }
 .profile-header { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 1.2rem; padding-bottom: 2.25rem; border-bottom: 1px solid var(--line); }
@@ -697,12 +704,14 @@ main { overflow: clip; }
   overflow: hidden;
   background: transparent;
   perspective: 1500px;
+  isolation: isolate;
 }
 .invitation-intro::before {
   content: "";
   position: absolute;
   inset: 0;
   background: radial-gradient(circle at 50% 42%, #392823 0, #171310 58%, #0e0b09 100%);
+  will-change: opacity;
 }
 .invitation-scene {
   position: relative;
@@ -710,6 +719,13 @@ main { overflow: clip; }
   width: min(680px, 84vw);
   aspect-ratio: 1.58;
   perspective: 1500px;
+  will-change: transform, opacity;
+}
+.intro-arriving::before {
+  animation: invitation-backdrop-arrive .78s ease-out both;
+}
+.intro-arriving .invitation-scene {
+  animation: invitation-scene-arrive .9s cubic-bezier(.16, 1, .3, 1) both;
 }
 .envelope-shell {
   position: absolute;
@@ -761,6 +777,7 @@ main { overflow: clip; }
   outline: 2px solid #d3a856;
   outline-offset: 5px;
 }
+.intro-arriving .invitation-card,
 .intro-sealed .invitation-card {
   visibility: hidden;
   opacity: 0;
@@ -993,6 +1010,14 @@ main { overflow: clip; }
   animation: starlight-scatter 2.2s var(--star-delay) cubic-bezier(.12, .68, .18, 1) both;
 }
 
+@keyframes invitation-backdrop-arrive {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes invitation-scene-arrive {
+  from { opacity: 0; transform: translate3d(0, 18px, 0) scale(.965); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
 @keyframes seal-left-release {
   0%, 18% { transform: translate3d(0, 0, 0) rotate(0); opacity: 1; }
   100% { transform: translate3d(-48%, 8%, 0) rotate(-18deg); opacity: 0; }

@@ -44,7 +44,13 @@ async function loadItem() {
 }
 
 async function submitBid() {
-  action.type = 'bid'; action.error = ''; action.success = '';
+  action.error = ''; action.success = '';
+  const amount = Number(bidAmount.value);
+  if (!Number.isFinite(amount)) action.error = 'Enter a valid bid amount.';
+  else if (amount < minimumBid.value) action.error = `Enter a bid of at least ${formatCurrency(minimumBid.value)}.`;
+  if (action.error) return;
+
+  action.type = 'bid';
   try {
     await apiRequest(`/item/${route.params.id}/bid`, {
       method: 'POST', token: authStore.state.token, body: { amount: Number(bidAmount.value) }
@@ -59,7 +65,12 @@ async function submitBid() {
 }
 
 async function submitQuestion() {
-  action.type = 'question'; action.error = ''; action.success = '';
+  action.error = ''; action.success = '';
+  if (!questionText.value) {
+    action.error = 'Enter a question for the seller.';
+    return;
+  }
+  action.type = 'question';
   try {
     await apiRequest(`/item/${route.params.id}/question`, {
       method: 'POST', token: authStore.state.token, body: { question_text: questionText.value }
@@ -75,7 +86,12 @@ async function submitQuestion() {
 }
 
 async function submitAnswer(questionId) {
-  action.type = `answer-${questionId}`; action.error = ''; action.success = '';
+  action.error = ''; action.success = '';
+  if (!answers[questionId]?.trim()) {
+    action.error = 'Enter an answer before submitting.';
+    return;
+  }
+  action.type = `answer-${questionId}`;
   try {
     await apiRequest(`/question/${questionId}`, {
       method: 'POST', token: authStore.state.token, body: { answer_text: answers[questionId] }
@@ -127,6 +143,7 @@ watch(() => route.params.id, loadItem);
           <form
             v-if="authStore.isAuthenticated && !isSeller && !auctionClosed"
             class="inline-form bid-form"
+            novalidate
             @submit.prevent="submitBid"
           >
             <label for="bid-amount">Your bid (minimum {{ formatCurrency(minimumBid) }})</label>
@@ -168,6 +185,7 @@ watch(() => route.params.id, loadItem);
           <form
             v-if="authStore.isAuthenticated && !isSeller"
             class="question-form"
+            novalidate
             @submit.prevent="submitQuestion"
           >
             <label for="question-text">Ask the seller a question</label>
@@ -183,7 +201,7 @@ watch(() => route.params.id, loadItem);
             <article v-for="question in questions" :key="question.question_id" class="question-item">
               <h3><span aria-hidden="true">Q</span>{{ question.question_text }}</h3>
               <p v-if="question.answer_text"><strong>Seller's answer</strong>{{ question.answer_text }}</p>
-              <form v-else-if="isSeller" class="answer-form" @submit.prevent="submitAnswer(question.question_id)">
+              <form v-else-if="isSeller" class="answer-form" novalidate @submit.prevent="submitAnswer(question.question_id)">
                 <label :for="`answer-${question.question_id}`">Answer this question</label>
                 <div>
                   <input :id="`answer-${question.question_id}`" v-model.trim="answers[question.question_id]" maxlength="1000" required />
