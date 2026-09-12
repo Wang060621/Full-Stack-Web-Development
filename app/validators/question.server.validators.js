@@ -1,11 +1,11 @@
 const Joi = require('joi');
 
 const question = Joi.object({
-    question_text: Joi.string().trim().min(1).required()
+    question_text: Joi.string().trim().min(1).max(500).required()
 }).unknown(false);
 
 const answer = Joi.object({
-    answer_text: Joi.string().trim().min(1).required()
+    answer_text: Joi.string().trim().min(1).max(1000).required()
 }).unknown(false);
 
 const validate = (schema, value) => schema.validate(value, {

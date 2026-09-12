@@ -1,10 +1,7 @@
 const users = require('../models/user.server.models');
 const passwords = require('../lib/passwords');
 const validators = require('../validators/user.server.validators');
-
-const errorResponse = (res, status, message) => res
-    .status(status)
-    .json({ error_message: message });
+const { errorResponse, successResponse, parsePositiveId } = require('../lib/http');
 
 const createUser = async (req, res) => {
     const { error, value } = validators.validateCreateUser(req.body);
@@ -22,7 +19,7 @@ const createUser = async (req, res) => {
             salt
         });
 
-        return res.status(201).json({ user_id: userId });
+        return successResponse(res, 201, { user_id: userId });
     } catch (err) {
         if (err.code === 'SQLITE_CONSTRAINT') {
             return errorResponse(res, 400, 'An account with this email already exists');
@@ -47,7 +44,7 @@ const login = async (req, res) => {
             await users.setSessionToken(user.user_id, sessionToken);
         }
 
-        return res.status(200).json({
+        return successResponse(res, 200, {
             user_id: user.user_id,
             session_token: sessionToken
         });
@@ -59,14 +56,14 @@ const login = async (req, res) => {
 
 const logout = async (req, res) => {
     const token = req.get('X-Authorization');
-    if (!token) return res.sendStatus(401);
+    if (!token) return errorResponse(res, 401, 'Authentication required');
 
     try {
         const user = await users.getUserByToken(token);
-        if (!user) return res.sendStatus(401);
+        if (!user) return errorResponse(res, 401, 'Invalid session');
 
         await users.setSessionToken(user.user_id, null);
-        return res.sendStatus(200);
+        return successResponse(res, 200);
     } catch (err) {
         console.error('Failed to log out:', err.message);
         return errorResponse(res, 500, 'Internal server error');
@@ -74,12 +71,12 @@ const logout = async (req, res) => {
 };
 
 const getUserProfile = async (req, res) => {
-    const userId = Number(req.params.user_id);
-    if (!Number.isSafeInteger(userId) || userId < 1) return res.sendStatus(404);
+    const userId = parsePositiveId(req.params.user_id);
+    if (!userId) return errorResponse(res, 404, 'User not found');
 
     try {
         const user = await users.getUserById(userId);
-        if (!user) return res.sendStatus(404);
+        if (!user) return errorResponse(res, 404, 'User not found');
 
         const now = Date.now();
         const [selling, biddingOn, auctionsEnded] = await Promise.all([
@@ -88,7 +85,7 @@ const getUserProfile = async (req, res) => {
             users.getEndedItems(userId, now)
         ]);
 
-        return res.status(200).json({
+        return successResponse(res, 200, {
             user_id: user.user_id,
             first_name: user.first_name,
             last_name: user.last_name,

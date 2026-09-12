@@ -1,6 +1,7 @@
 const items = require('../models/item.server.models');
 const validators = require('../validators/core.server.validators');
-const { errorResponse, parsePositiveId } = require('../lib/http');
+const { fieldsContainBlockedContent } = require('../lib/content-filter');
+const { errorResponse, successResponse, parsePositiveId } = require('../lib/http');
 
 const createItem = async (req, res) => {
     const { error, value } = validators.validateCreateItem(req.body);
@@ -11,13 +12,17 @@ const createItem = async (req, res) => {
         return errorResponse(res, 400, 'end_date must be an integer in the future');
     }
 
+    if (fieldsContainBlockedContent(value.name, value.description)) {
+        return errorResponse(res, 400, 'Item content contains language that is not allowed');
+    }
+
     try {
         const itemId = await items.createItem({
             ...value,
             end_date: endDate,
             creator_id: req.authenticatedUser.user_id
         });
-        return res.status(201).json({ item_id: itemId });
+        return successResponse(res, 201, { item_id: itemId });
     } catch (err) {
         console.error('Failed to create item:', err.message);
         return errorResponse(res, 500, 'Internal server error');
@@ -26,11 +31,11 @@ const createItem = async (req, res) => {
 
 const getItem = async (req, res) => {
     const itemId = parsePositiveId(req.params.item_id);
-    if (!itemId) return res.sendStatus(404);
+    if (!itemId) return errorResponse(res, 404, 'Item not found');
 
     try {
         const item = await items.getItemById(itemId);
-        if (!item) return res.sendStatus(404);
+        if (!item) return errorResponse(res, 404, 'Item not found');
 
         const currentBidHolder = item.current_bid_holder_id === null
             ? null
@@ -40,7 +45,7 @@ const getItem = async (req, res) => {
                 last_name: item.current_bid_holder_last_name
             };
 
-        return res.status(200).json({
+        return successResponse(res, 200, {
             item_id: item.item_id,
             name: item.name,
             description: item.description,
@@ -61,14 +66,14 @@ const getItem = async (req, res) => {
 
 const getBidHistory = async (req, res) => {
     const itemId = parsePositiveId(req.params.item_id);
-    if (!itemId) return res.sendStatus(404);
+    if (!itemId) return errorResponse(res, 404, 'Item not found');
 
     try {
         const item = await items.getItemById(itemId);
-        if (!item) return res.sendStatus(404);
+        if (!item) return errorResponse(res, 404, 'Item not found');
 
         const bids = await items.getBidHistory(itemId);
-        return res.status(200).json(bids);
+        return successResponse(res, 200, bids);
     } catch (err) {
         console.error('Failed to get bid history:', err.message);
         return errorResponse(res, 500, 'Internal server error');
@@ -80,12 +85,14 @@ const addBid = async (req, res) => {
     if (error) return errorResponse(res, 400, error.details[0].message);
 
     const itemId = parsePositiveId(req.params.item_id);
-    if (!itemId) return res.sendStatus(404);
+    if (!itemId) return errorResponse(res, 404, 'Item not found');
 
     try {
         const item = await items.getItemById(itemId);
-        if (!item) return res.sendStatus(404);
-        if (item.creator_id === req.authenticatedUser.user_id) return res.sendStatus(403);
+        if (!item) return errorResponse(res, 404, 'Item not found');
+        if (item.creator_id === req.authenticatedUser.user_id) {
+            return errorResponse(res, 403, 'You cannot bid on your own item');
+        }
         if (item.end_date <= Date.now()) {
             return errorResponse(res, 400, 'Bidding has closed for this item');
         }
@@ -95,8 +102,15 @@ const addBid = async (req, res) => {
             return errorResponse(res, 400, 'Bid must be greater than the current bid');
         }
 
-        await items.addBid(itemId, req.authenticatedUser.user_id, value.amount);
-        return res.sendStatus(201);
+        const result = await items.addBidIfHighest(
+            itemId,
+            req.authenticatedUser.user_id,
+            value.amount
+        );
+        if (!result.changes) {
+            return errorResponse(res, 400, 'Bid must be greater than the current bid');
+        }
+        return successResponse(res, 201);
     } catch (err) {
         if (err.code === 'SQLITE_CONSTRAINT') {
             return errorResponse(res, 400, 'This bid could not be accepted');
@@ -134,7 +148,7 @@ const search = async (req, res) => {
             userId: authenticatedUser?.user_id,
             now: Date.now()
         });
-        return res.status(200).json(results);
+        return successResponse(res, 200, results);
     } catch (err) {
         console.error('Failed to search items:', err.message);
         return errorResponse(res, 500, 'Internal server error');

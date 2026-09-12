@@ -1,25 +1,4 @@
-const db = require('../../database');
-
-const run = (sql, params = []) => new Promise((resolve, reject) => {
-    db.run(sql, params, function onResult(err) {
-        if (err) return reject(err);
-        return resolve({ id: this.lastID, changes: this.changes });
-    });
-});
-
-const get = (sql, params = []) => new Promise((resolve, reject) => {
-    db.get(sql, params, (err, row) => {
-        if (err) return reject(err);
-        return resolve(row);
-    });
-});
-
-const all = (sql, params = []) => new Promise((resolve, reject) => {
-    db.all(sql, params, (err, rows) => {
-        if (err) return reject(err);
-        return resolve(rows);
-    });
-});
+const { run, get, all } = require('../lib/database');
 
 const createItem = async ({ name, description, starting_bid, end_date, creator_id }) => {
     const result = await run(
@@ -75,10 +54,14 @@ const getBidHistory = (itemId) => all(
     [itemId]
 );
 
-const addBid = (itemId, userId, amount) => run(
+const addBidIfHighest = (itemId, userId, amount) => run(
     `INSERT INTO bids (item_id, user_id, amount, timestamp)
-     VALUES (?, ?, ?, ?)`,
-    [itemId, userId, amount, Date.now()]
+     SELECT ?, ?, ?, ?
+     WHERE ? > COALESCE(
+        (SELECT MAX(b.amount) FROM bids b WHERE b.item_id = ?),
+        (SELECT i.starting_bid FROM items i WHERE i.item_id = ?)
+     )`,
+    [itemId, userId, amount, Date.now(), amount, itemId, itemId]
 );
 
 const itemSummarySql = `
@@ -133,6 +116,6 @@ module.exports = {
     createItem,
     getItemById,
     getBidHistory,
-    addBid,
+    addBidIfHighest,
     searchItems
 };

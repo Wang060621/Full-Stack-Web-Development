@@ -10,14 +10,14 @@ const password = Joi.string()
     .required();
 
 const createUser = Joi.object({
-    first_name: Joi.string().trim().min(1).required(),
-    last_name: Joi.string().trim().min(1).required(),
-    email: Joi.string().trim().email({ tlds: { allow: false } }).required(),
+    first_name: Joi.string().trim().min(1).max(50).required(),
+    last_name: Joi.string().trim().min(1).max(50).required(),
+    email: Joi.string().trim().max(254).email({ tlds: { allow: false } }).required(),
     password
 }).unknown(false);
 
 const login = Joi.object({
-    email: Joi.string().trim().email({ tlds: { allow: false } }).required(),
+    email: Joi.string().trim().max(254).email({ tlds: { allow: false } }).required(),
     password: Joi.string().min(1).required()
 }).unknown(false);
 

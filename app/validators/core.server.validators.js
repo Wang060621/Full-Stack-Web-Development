@@ -6,8 +6,8 @@ const integerOrIntegerString = Joi.alternatives().try(
 );
 
 const createItem = Joi.object({
-    name: Joi.string().trim().min(1).required(),
-    description: Joi.string().trim().min(1).required(),
+    name: Joi.string().trim().min(1).max(100).required(),
+    description: Joi.string().trim().min(1).max(2000).required(),
     starting_bid: Joi.number().integer().min(0).required(),
     end_date: integerOrIntegerString.required()
 }).unknown(false);
@@ -17,7 +17,7 @@ const addBid = Joi.object({
 }).unknown(false);
 
 const search = Joi.object({
-    q: Joi.string().min(1),
+    q: Joi.string().trim().min(1).max(100),
     status: Joi.string().valid('BID', 'OPEN', 'ARCHIVE'),
     limit: Joi.number().integer().min(1).max(100).default(20),
     offset: Joi.number().integer().min(0).default(0)

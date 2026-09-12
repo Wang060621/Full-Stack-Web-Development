@@ -1,0 +1,35 @@
+<script setup>
+import { RouterLink } from 'vue-router';
+import RecordCover from './RecordCover.vue';
+import { timeRemaining } from '../utils/format';
+
+defineProps({
+  item: { type: Object, required: true },
+  currentUserId: { type: Number, default: null },
+  index: { type: Number, default: 0 }
+});
+</script>
+
+<template>
+  <article class="auction-card" :style="{ '--card-order': index }">
+    <RouterLink :to="`/items/${item.item_id}`" class="card-image-link" tabindex="-1" aria-hidden="true">
+      <RecordCover :item-id="item.item_id" />
+      <span class="lot-stamp">LOT {{ String(item.item_id).padStart(3, '0') }}</span>
+      <span class="cover-cue">View lot <span aria-hidden="true">↗</span></span>
+    </RouterLink>
+    <div class="card-body">
+      <p class="card-time">
+        {{ timeRemaining(item.end_date) }}
+      </p>
+      <h2><RouterLink :to="`/items/${item.item_id}`">{{ item.name }}</RouterLink></h2>
+      <p class="seller">Offered by {{ item.first_name }} {{ item.last_name }}</p>
+      <RouterLink
+        v-if="currentUserId === item.creator_id"
+        class="edit-link"
+        :to="`/items/${item.item_id}/edit`"
+      >
+        Edit page
+      </RouterLink>
+    </div>
+  </article>
+</template>

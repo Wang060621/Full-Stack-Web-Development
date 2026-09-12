@@ -3,11 +3,11 @@ const { errorResponse } = require('../lib/http');
 
 const requireAuthentication = async (req, res, next) => {
     const token = req.get('X-Authorization');
-    if (!token) return res.sendStatus(401);
+    if (!token) return errorResponse(res, 401, 'Authentication required');
 
     try {
         const user = await users.getUserByToken(token);
-        if (!user) return res.sendStatus(401);
+        if (!user) return errorResponse(res, 401, 'Invalid session');
 
         req.authenticatedUser = user;
         return next();
