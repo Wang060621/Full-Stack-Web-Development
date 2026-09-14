@@ -19,7 +19,7 @@ export function registerWebMcpTools(router) {
   register({
     name: 'search_auctions',
     title: 'Search auctions',
-    description: 'Search public GrooveGavel lots by record name and return up to 20 results.',
+    description: 'Search public GrooveGavel lots by record name or description and return up to 20 results.',
     inputSchema: {
       type: 'object',
       properties: { query: { type: 'string', maxLength: 100 } },
@@ -45,7 +45,13 @@ export function registerWebMcpTools(router) {
         name: { type: 'string', minLength: 1, maxLength: 100 },
         description: { type: 'string', minLength: 1, maxLength: 2000 },
         startingBid: { type: 'integer', minimum: 0 },
-        endDate: { type: 'integer', description: 'Future Unix timestamp in milliseconds' }
+        endDate: { type: 'integer', description: 'Future Unix timestamp in milliseconds' },
+        categoryIds: {
+          type: 'array',
+          items: { type: 'integer', minimum: 1 },
+          maxItems: 3,
+          uniqueItems: true
+        }
       },
       required: ['name', 'description', 'startingBid', 'endDate'],
       additionalProperties: false
@@ -57,6 +63,12 @@ export function registerWebMcpTools(router) {
       if (typeof input.description !== 'string' || !input.description.trim()) fail('description is required');
       if (!Number.isSafeInteger(input.startingBid) || input.startingBid < 0) fail('startingBid must be a non-negative integer');
       if (!Number.isSafeInteger(input.endDate) || input.endDate <= Date.now()) fail('endDate must be a future timestamp in milliseconds');
+      if (input.categoryIds !== undefined && (
+        !Array.isArray(input.categoryIds)
+        || input.categoryIds.length > 3
+        || new Set(input.categoryIds).size !== input.categoryIds.length
+        || input.categoryIds.some((id) => !Number.isSafeInteger(id) || id < 1)
+      )) fail('categoryIds must contain up to three unique positive integers');
 
       const result = await apiRequest('/item', {
         method: 'POST',
@@ -65,7 +77,8 @@ export function registerWebMcpTools(router) {
           name: input.name.trim(),
           description: input.description.trim(),
           starting_bid: input.startingBid,
-          end_date: input.endDate
+          end_date: input.endDate,
+          category_ids: input.categoryIds || []
         }
       });
       await router.push(`/items/${result.item_id}`);

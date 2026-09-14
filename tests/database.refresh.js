@@ -5,58 +5,58 @@ let count = 0
 console.log("****************************************")
 console.log("Deleting data...")  
 
-const sql = 'DELETE FROM questions'
+const sql = 'DELETE FROM item_categories'
 
 db.run(sql, [], function(err){
     if(err) throw err
 
-    console.log("Questions: All data deleted")
+    console.log("Item categories: All data deleted")
     count++
 
-    const sql = 'DELETE FROM bids'
+    const sql = 'DELETE FROM questions'
 
     db.run(sql, [], function(err){
         if(err) throw err
     
-        console.log("Bids: All data deleted")
+        console.log("Questions: All data deleted")
         count++
-    
-        const sql = 'DELETE FROM items'
+
+        const sql = 'DELETE FROM bids'
     
         db.run(sql, [], function(err){
             if(err) throw err
         
-            console.log("Items: All data deleted")
+            console.log("Bids: All data deleted")
             count++
 
-            const sql = 'DELETE FROM users'
+            const sql = 'DELETE FROM items'
     
             db.run(sql, [], function(err){
                 if(err) throw err
         
-                console.log("Users: All data deleted")
+                console.log("Items: All data deleted")
                 count++
 
-                const sql = "UPDATE `sqlite_sequence` SET `seq` = 0 WHERE `name` = 'users'";
+                const sql = 'DELETE FROM users'
 
                 db.run(sql, [], function(err){
                     if(err) throw err
 
-                    console.log("Users: reset ID counter")
+                    console.log("Users: All data deleted")
                     count++
 
-                    const sql = "UPDATE `sqlite_sequence` SET `seq` = 0 WHERE `name` = 'items'";
+                    const sql = "UPDATE `sqlite_sequence` SET `seq` = 0 WHERE `name` = 'users'";
                     db.run(sql, [], function(err){
                         if(err) throw err
 
-                        console.log("Items: reset ID counter")
+                        console.log("Users: reset ID counter")
                         count++
 
-                        const sql = "UPDATE `sqlite_sequence` SET `seq` = 0 WHERE `name` = 'bids'";
+                        const sql = "UPDATE `sqlite_sequence` SET `seq` = 0 WHERE `name` = 'items'";
                         db.run(sql, [], function(err){
                             if(err) throw err
 
-                            console.log("Bids: reset ID counter")
+                            console.log("Items: reset ID counter")
                             count++
 
                             const sql = "UPDATE `sqlite_sequence` SET `seq` = 0 WHERE `name` = 'questions'";

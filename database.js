@@ -9,6 +9,9 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
     }else{
         console.log('Connected to the SQLite database.')
 
+        db.serialize(() => {
+        db.run('PRAGMA foreign_keys = ON');
+
         db.run(`CREATE TABLE users (
                 user_id INTEGER PRIMARY KEY AUTOINCREMENT,
                 first_name text,
@@ -80,6 +83,52 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
                 }
             }
         );
+
+        db.run(`CREATE TABLE categories (
+                category_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL UNIQUE COLLATE NOCASE
+            )`, (err) => {
+                if(err){
+                    console.log('Categories table already created');
+                }else{
+                    console.log('Categories table created');
+                }
+            }
+        );
+
+        db.run(`CREATE TABLE item_categories (
+                item_id INTEGER NOT NULL,
+                category_id INTEGER NOT NULL,
+                PRIMARY KEY (item_id, category_id),
+                FOREIGN KEY (item_id) REFERENCES items(item_id) ON DELETE CASCADE,
+                FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE RESTRICT
+            )`, (err) => {
+                if(err){
+                    console.log('Item categories table already created');
+                }else{
+                    console.log('Item categories table created');
+                }
+            }
+        );
+
+        const defaultCategories = [
+            'Jazz',
+            'Rock',
+            'Soul & Funk',
+            'Electronic',
+            'Hip-Hop',
+            'Classical',
+            'Other'
+        ];
+        const placeholders = defaultCategories.map(() => '(?)').join(', ');
+        db.run(
+            `INSERT OR IGNORE INTO categories (name) VALUES ${placeholders}`,
+            defaultCategories,
+            (err) => {
+                if (err) console.error('Failed to seed categories:', err.message);
+            }
+        );
+        });
     }
 });
 

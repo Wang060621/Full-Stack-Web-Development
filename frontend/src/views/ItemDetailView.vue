@@ -129,6 +129,9 @@ watch(() => route.params.id, loadItem);
         <div class="detail-summary">
           <p class="eyebrow">{{ auctionClosed ? 'Auction ended' : `${timeRemaining(item.end_date)} remaining` }}</p>
           <h1>{{ item.name }}</h1>
+          <ul v-if="item.categories?.length" class="category-tags" aria-label="Categories">
+            <li v-for="category in item.categories" :key="category.category_id">{{ category.name }}</li>
+          </ul>
           <p class="detail-description">{{ item.description }}</p>
           <dl class="bid-facts">
             <div><dt>Current price</dt><dd>{{ formatCurrency(item.current_bid) }}</dd></div>

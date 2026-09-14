@@ -36,6 +36,9 @@ const askQuestion = async (req, res) => {
 const answerQuestion = async (req, res) => {
     const { error, value } = validators.validateAnswer(req.body);
     if (error) return errorResponse(res, 400, error.details[0].message);
+    if (containsBlockedContent(value.answer_text)) {
+        return errorResponse(res, 400, 'Answer contains language that is not allowed');
+    }
 
     const questionId = parsePositiveId(req.params.question_id);
     if (!questionId) return errorResponse(res, 404, 'Question not found');

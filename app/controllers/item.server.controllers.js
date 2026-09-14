@@ -1,4 +1,5 @@
 const items = require('../models/item.server.models');
+const categories = require('../models/category.server.models');
 const validators = require('../validators/core.server.validators');
 const { fieldsContainBlockedContent } = require('../lib/content-filter');
 const { errorResponse, successResponse, parsePositiveId } = require('../lib/http');
@@ -17,6 +18,12 @@ const createItem = async (req, res) => {
     }
 
     try {
+        if (value.category_ids?.length) {
+            const foundCategoryCount = await categories.countCategoriesByIds(value.category_ids);
+            if (foundCategoryCount !== value.category_ids.length) {
+                return errorResponse(res, 400, 'One or more categories do not exist');
+            }
+        }
         const itemId = await items.createItem({
             ...value,
             end_date: endDate,
@@ -55,6 +62,7 @@ const getItem = async (req, res) => {
             creator_id: item.creator_id,
             first_name: item.first_name,
             last_name: item.last_name,
+            categories: item.categories,
             current_bid: item.current_bid === null ? item.starting_bid : item.current_bid,
             current_bid_holder: currentBidHolder
         });

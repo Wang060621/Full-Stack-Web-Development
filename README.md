@@ -1,49 +1,84 @@
-# Auctionary Starter Code
+# GrooveGavel Auctionary
 
-**For the full-stack web development assignment 26/27**
+GrooveGavel is a full-stack auction application with an Express/SQLite API and a Vue/Vite frontend. Users can register, sign in, publish auction lots, bid, ask and answer questions, search the catalogue, organise records by category, and keep unpublished drafts in their browser.
 
-Steps to download and run:
-1. Make sure you have NodeJS installed on your machine ([Download NodeJS](https://nodejs.org/en/download/))
-2. Make sure you have Git installed on your machine  ([Install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)/[Mirror Download for Windows Version](https://gitcode.com/MMJISE/se-software-pool))
-2. In your terminal, navigate to the directory where you want to download the project
-3. Run `git clone https://gitcode.com/MMJISE/auctionary_starter`
-4. Once the project has finished downloading, navigate into the projects root directory `cd auctionary_starter`
-5. Run `npm install` to install all dependencies for the project
-6. Once the dependencies have installed, run the server using `npm run dev`. You will see a message saying that the server is running on port 3333.
-7. In a **separate terminal window** navigate to the projects root directory and run `npm run test` to run the tests. The tests will mostly fail, but that is because we have not yet written any code.
+## Requirements
 
-Once you have completed the above, you are set up and ready to begin work on the assignment.
+- Node.js 20 or newer
+- npm 10 or newer
 
-**Things to remember:**
-1. To re-run the tests, you can first wipe the DB by running `npm run wipe`. The tests assume a fresh database each time.
-2. The tests may have mistakes too, check your work manually (using Postman). If you're not sure, ask.
-3. The API documentation is located on Swagger [here](https://app.swaggerhub.com/apis/XCUI/Auctionary/1.0.0)
+No external database server, API key, or secret configuration is required. The backend uses the local `db.sqlite` file and creates its tables automatically.
 
-If you have any issues and questions, please let me know.
+## Install
 
-Xia
+From the project root:
 
-## Backend implementation
+```text
+npm install
+npm --prefix frontend install
+```
 
-The complete base Auctionary API is implemented under `app/`:
+## Run
 
-- `POST /users` - register a user
-- `POST /login` - create or reuse a session token
-- `POST /logout` - invalidate a session token
-- `GET /users/:user_id` - retrieve a public user profile
-- `POST /item` and `GET /item/:item_id` - create and view auctions
-- `POST /item/:item_id/bid` and `GET /item/:item_id/bid` - place and view bids
-- `POST /item/:item_id/question`, `POST /question/:question_id`, and
-  `GET /item/:item_id/question` - ask, answer, and view questions
-- `GET /search` - search and filter auctions with pagination
+Open two terminals in the project root.
 
-Run the backend and checks in separate terminals:
+Terminal 1 — API at `http://localhost:3333`:
 
 ```text
 npm run dev
-npm run wipe
-npm test
 ```
 
-Project planning and verification notes are in `docs/`. The Postman collection is in
-`postman/Auctionary-Week-1.postman_collection.json`.
+Terminal 2 — frontend at `http://127.0.0.1:5173`:
+
+```text
+npm run frontend:dev
+```
+
+The frontend uses `http://localhost:3333` by default. To point it at another API, set `VITE_API_URL` before starting Vite.
+
+## Test from an empty database
+
+Keep the API running, then use a third terminal:
+
+```text
+npm run test:clean
+```
+
+This removes auction, bid, question, user, and item-category data, resets generated IDs, and runs the complete API suite. Seeded category names remain available. To run the steps separately, use `npm run wipe` followed by `npm test`.
+
+Build the production frontend with:
+
+```text
+npm run build
+```
+
+The compiled files are written to `frontend/dist/`.
+
+## Week 5 extensions
+
+- Sensitive-content checks reject disallowed language in new auction names/descriptions, questions, and answers. Validation failures return a JSON `error_message` and never write the rejected content.
+- `GET /categories` returns the category catalogue. A new auction accepts up to three unique `category_ids`, and `GET /search?category_id=1` filters by category. Search covers both the auction name and description.
+- The Sell a record page can save, reopen, update, and delete multiple drafts. Drafts are scoped to the signed-in user and stored only in that browser's local storage. Publishing a loaded draft removes it.
+
+Core endpoints:
+
+- `POST /users`, `POST /login`, `POST /logout`, `GET /users/:user_id`
+- `POST /item`, `GET /item/:item_id`
+- `POST /item/:item_id/bid`, `GET /item/:item_id/bid`
+- `POST /item/:item_id/question`, `POST /question/:question_id`, `GET /item/:item_id/question`
+- `GET /search`, `GET /categories`
+
+Authenticated requests use the `X-Authorization` header returned by `POST /login`.
+
+## Demonstration and acceptance
+
+The five-minute demo route, manual edge cases, refresh/direct-navigation checks, security review, and packaging checklist are documented in [`docs/week-5-checklist.md`](docs/week-5-checklist.md).
+
+The original assessment API specification is included in the project root. Earlier implementation notes are under `docs/`, and the Postman collection is under `postman/`.
+
+## Troubleshooting
+
+- If the frontend says it cannot reach the auction service, confirm the API is running on port 3333.
+- If port 3333 is already in use, stop the other process before starting the API.
+- Drafts do not sync between browsers or devices. Clearing site data deletes them.
+- If schema changes are not visible, stop and restart the API so its startup migration can run.

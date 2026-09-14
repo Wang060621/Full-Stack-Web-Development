@@ -10,6 +10,9 @@ const loading = ref(true);
 const error = ref('');
 const query = ref('');
 const activeStatus = ref('');
+const activeCategory = ref('');
+const categories = ref([]);
+const categoryError = ref('');
 const offset = ref(0);
 const pageSize = 6;
 let controller;
@@ -32,6 +35,7 @@ async function loadItems({ reset = false } = {}) {
   const params = new URLSearchParams({ limit: String(pageSize), offset: String(offset.value) });
   if (query.value.trim()) params.set('q', query.value.trim());
   if (activeStatus.value) params.set('status', activeStatus.value);
+  if (activeCategory.value) params.set('category_id', activeCategory.value);
 
   try {
     items.value = await apiRequest(`/search?${params}`, {
@@ -62,7 +66,18 @@ function changePage(delta) {
   loadItems();
 }
 
-onMounted(loadItems);
+async function loadCategories() {
+  try {
+    categories.value = await apiRequest('/categories');
+  } catch (requestError) {
+    categoryError.value = requestError.message;
+  }
+}
+
+onMounted(() => {
+  loadItems();
+  loadCategories();
+});
 watch(() => authStore.isAuthenticated, (authenticated) => {
   if (!authenticated && activeStatus.value) {
     activeStatus.value = '';
@@ -81,7 +96,14 @@ onBeforeUnmount(() => controller?.abort());
       </div>
       <form class="search-bar" role="search" novalidate @submit.prevent="loadItems({ reset: true })">
         <label class="sr-only" for="market-search">Search records</label>
-        <input id="market-search" v-model="query" maxlength="100" placeholder="Search by record name" />
+        <input id="market-search" v-model="query" maxlength="100" placeholder="Search name or description" />
+        <label class="sr-only" for="category-filter">Filter by category</label>
+        <select id="category-filter" v-model="activeCategory" @change="loadItems({ reset: true })">
+          <option value="">All categories</option>
+          <option v-for="category in categories" :key="category.category_id" :value="String(category.category_id)">
+            {{ category.name }}
+          </option>
+        </select>
         <button type="submit">Search</button>
       </form>
     </div>
@@ -103,6 +125,7 @@ onBeforeUnmount(() => controller?.abort());
       </div>
     </div>
 
+    <StatusPanel v-if="categoryError" type="error" title="Category filter unavailable" :message="categoryError" />
     <StatusPanel v-if="error" type="error" title="Unable to load auctions" :message="error" />
     <div v-else-if="loading" class="loading-grid" role="status" aria-label="Loading auctions">
       <div v-for="index in 3" :key="index" class="skeleton-card" />

@@ -22,6 +22,9 @@ defineProps({
         {{ timeRemaining(item.end_date) }}
       </p>
       <h2><RouterLink :to="`/items/${item.item_id}`">{{ item.name }}</RouterLink></h2>
+      <ul v-if="item.categories?.length" class="category-tags" aria-label="Categories">
+        <li v-for="category in item.categories" :key="category.category_id">{{ category.name }}</li>
+      </ul>
       <p class="seller">Offered by {{ item.first_name }} {{ item.last_name }}</p>
       <RouterLink
         v-if="currentUserId === item.creator_id"
