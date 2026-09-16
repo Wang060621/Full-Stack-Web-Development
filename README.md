@@ -54,7 +54,7 @@ npm run build
 
 The compiled files are written to `frontend/dist/`.
 
-## Week 5 extensions
+## Iteration 5 extensions
 
 - Sensitive-content checks reject disallowed language in new auction names/descriptions, questions, and answers. Validation failures return a JSON `error_message` and never write the rejected content.
 - `GET /categories` returns the category catalogue. A new auction accepts up to three unique `category_ids`, and `GET /search?category_id=1` filters by category. Search covers both the auction name and description.
@@ -72,7 +72,7 @@ Authenticated requests use the `X-Authorization` header returned by `POST /login
 
 ## Demonstration and acceptance
 
-The five-minute demo route, manual edge cases, refresh/direct-navigation checks, security review, and packaging checklist are documented in [`docs/week-5-checklist.md`](docs/week-5-checklist.md).
+The five-minute demo route, manual edge cases, refresh/direct-navigation checks, security review, and packaging checklist are documented in [`docs/iteration-5-checklist.md`](docs/iteration-5-checklist.md).
 
 The original assessment API specification is included in the project root. Earlier implementation notes are under `docs/`, and the Postman collection is under `postman/`.
 

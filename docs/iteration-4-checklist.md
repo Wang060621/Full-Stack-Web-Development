@@ -1,4 +1,4 @@
-# Week 4 completion checklist
+# Iteration 4 completion checklist
 
 ## Front-end integration
 

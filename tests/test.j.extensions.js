@@ -12,7 +12,7 @@ let categoryIds;
 let itemId;
 let questionId;
 
-describe('Week 5 extensions', () => {
+describe('Iteration 5 extensions', () => {
     before(async () => {
         const [seller, buyer] = await Promise.all([
             chai.request(SERVER_URL).post('/login').send({

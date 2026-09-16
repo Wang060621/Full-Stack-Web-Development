@@ -1373,7 +1373,7 @@ nav a:hover::after, .nav-button:hover::after {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
 
-/* Week 5 extensions: categories and browser-local draft management. */
+/* Iteration 5 extensions: categories and browser-local draft management. */
 .search-bar select {
   min-width: 9.5rem;
   border: 0;

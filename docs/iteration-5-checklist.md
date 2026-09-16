@@ -1,4 +1,4 @@
-# Week 5 acceptance and demonstration checklist
+# Iteration 5 acceptance and demonstration checklist
 
 ## Implemented extensions
 

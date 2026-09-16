@@ -1,4 +1,4 @@
-# Week 3 completion notes
+# Iteration 3 completion notes
 
 ## Back-end hardening
 

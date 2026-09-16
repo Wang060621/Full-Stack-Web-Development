@@ -26,7 +26,7 @@ Status legend: **Done**, **Not started**, **N/A**. “Automated test” records 
 - `GET /users/{user_id}` deliberately omits email, password, salt, and session token.
 - Authentication uses the exact Swagger header name `X-Authorization`.
 
-## Week 1 verification
+## Iteration 1 verification
 
 - Official user creation tests: pass.
 - Official login/logout tests: pass.
@@ -34,7 +34,7 @@ Status legend: **Done**, **Not started**, **N/A**. “Automated test” records 
 - Postman/Newman collection: pass after a database wipe.
 - Clean-database startup: pass; SQLite and all four starter tables are recreated automatically.
 
-## Week 2 verification
+## Iteration 2 verification
 
 - The supplied course test files are preserved without modifications. With their
   original fixture/expectation mismatch, the clean-database run reports 120 passing
@@ -46,7 +46,7 @@ Status legend: **Done**, **Not started**, **N/A**. “Automated test” records 
   bid and search expectations. No application behavior depends on fixture IDs, names,
   or bid amounts.
 
-## Week 4 verification
+## Iteration 4 verification
 
 - All 12 base API operations above are reachable through the Vue interface.
 - An isolated browser flow passed for login, auction creation, a second user's bid
