@@ -19,7 +19,7 @@ export function registerWebMcpTools(router) {
   register({
     name: 'search_auctions',
     title: 'Search auctions',
-    description: 'Search public GrooveGavel lots by record name or description and return up to 20 results.',
+      description: 'Search public GrooveGavel lots by object name or description and return up to 20 results.',
     inputSchema: {
       type: 'object',
       properties: { query: { type: 'string', maxLength: 100 } },

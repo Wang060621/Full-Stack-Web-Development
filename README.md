@@ -1,6 +1,6 @@
 # GrooveGavel Auctionary
 
-GrooveGavel is a full-stack auction application with an Express/SQLite API and a Vue/Vite frontend. Users can register, sign in, publish auction lots, bid, ask and answer questions, search the catalogue, organise records by category, and keep unpublished drafts in their browser.
+GrooveGavel is a full-stack antique auction application with an Express/SQLite API and a Vue/Vite frontend. Users can register, sign in, publish auction lots, bid, ask and answer questions, search the collector’s catalogue, organise objects by category, and keep unpublished drafts in their browser.
 
 ## Requirements
 
@@ -58,7 +58,7 @@ The compiled files are written to `frontend/dist/`.
 
 - Sensitive-content checks reject disallowed language in new auction names/descriptions, questions, and answers. Validation failures return a JSON `error_message` and never write the rejected content.
 - `GET /categories` returns the category catalogue. A new auction accepts up to three unique `category_ids`, and `GET /search?category_id=1` filters by category. Search covers both the auction name and description.
-- The Sell a record page can save, reopen, update, and delete multiple drafts. Drafts are scoped to the signed-in user and stored only in that browser's local storage. Publishing a loaded draft removes it.
+- The List an object page can save, reopen, update, and delete multiple drafts. Drafts are scoped to the signed-in user and stored only in that browser's local storage. Publishing a loaded draft removes it.
 
 Core endpoints:
 

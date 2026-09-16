@@ -1,0 +1,559 @@
+/*
+ * GrooveGavel — collector's cabinet theme
+ * A layered visual treatment for timepieces, instruments and storied objects.
+ */
+
+:root {
+  --cabinet-ink: #1c1510;
+  --cabinet-walnut: #2c1b14;
+  --cabinet-walnut-light: #503121;
+  --cabinet-oxblood: #682833;
+  --cabinet-oxblood-light: #8b3d49;
+  --cabinet-brass: #b89352;
+  --cabinet-brass-light: #e0c587;
+  --cabinet-paper: #f3e8d2;
+  --cabinet-paper-light: #fff9ec;
+  --cabinet-muted: #74624c;
+  --wine: var(--cabinet-oxblood);
+  --wine-light: var(--cabinet-oxblood-light);
+  --wine-dark: var(--cabinet-walnut);
+  --charcoal: var(--cabinet-ink);
+  --charcoal-soft: var(--cabinet-walnut-light);
+  --brass: var(--cabinet-brass);
+  --brass-light: var(--cabinet-brass-light);
+  --parchment: var(--cabinet-paper);
+  --parchment-light: var(--cabinet-paper-light);
+  --ink: var(--cabinet-ink);
+  --muted: var(--cabinet-muted);
+  --violet: var(--cabinet-oxblood);
+  --violet-bright: var(--cabinet-oxblood-light);
+  --violet-dark: var(--cabinet-walnut);
+  --amber: var(--cabinet-brass);
+  --cream: var(--cabinet-paper);
+  --paper: var(--cabinet-paper-light);
+  --line: #947b58;
+}
+
+body {
+  background-color: var(--cabinet-paper);
+  background-image:
+    radial-gradient(circle at 8% 8%, rgba(255, 253, 244, .92), transparent 28rem),
+    radial-gradient(circle at 90% 64%, rgba(104, 40, 51, .07), transparent 32rem),
+    repeating-linear-gradient(0deg, rgba(67, 43, 25, .022) 0 1px, transparent 1px 5px);
+}
+
+body::before {
+  opacity: .055;
+  background-image: repeating-radial-gradient(circle at 20% 30%, transparent 0 2px, rgba(56, 37, 22, .48) 2.5px 2.9px);
+  background-size: 12px 12px;
+}
+
+::selection {
+  color: #fff8e8;
+  background: var(--cabinet-oxblood);
+}
+
+/* Dark walnut shopfront */
+.site-header {
+  min-height: 82px;
+  border-top: 4px solid var(--cabinet-brass);
+  border-bottom: 1px solid rgba(224, 197, 135, .58);
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, .025), transparent 24%, rgba(255, 255, 255, .025) 50%, transparent 76%),
+    repeating-linear-gradient(92deg, rgba(255, 255, 255, .018) 0 1px, transparent 1px 22px),
+    linear-gradient(100deg, #160e0b, #342018 48%, #160e0b);
+  box-shadow: 0 4px 0 var(--cabinet-oxblood), 0 16px 34px rgba(35, 20, 12, .2);
+}
+
+.site-header::after {
+  bottom: 6px;
+  background: linear-gradient(90deg, transparent, rgba(224, 197, 135, .5) 16% 84%, transparent);
+}
+
+.brand-mark {
+  width: 3rem;
+  border: 1px solid var(--cabinet-brass-light);
+  border-radius: 50% 50% 46% 46%;
+  outline: 1px solid rgba(224, 197, 135, .56);
+  outline-offset: 4px;
+  clip-path: none;
+  color: #f5dca5;
+  background:
+    radial-gradient(circle at 50% 42%, #7a3040 0 17%, transparent 18%),
+    radial-gradient(circle, #2c1812 0 57%, #17100c 58%);
+  box-shadow: inset 0 0 0 5px rgba(8, 5, 4, .56), 0 2px 10px rgba(0, 0, 0, .24);
+  font-style: italic;
+}
+
+.brand strong {
+  color: #fff6df;
+}
+
+.brand small {
+  color: var(--cabinet-brass-light);
+  letter-spacing: .2em;
+}
+
+nav a,
+.nav-button {
+  color: #eadfca;
+}
+
+nav a:not(.nav-cta)::after,
+.nav-button::after {
+  background: linear-gradient(90deg, transparent, var(--cabinet-brass-light), transparent);
+}
+
+.nav-cta {
+  border-color: var(--cabinet-brass);
+  color: #fff7e4 !important;
+  background: var(--cabinet-oxblood);
+  box-shadow: inset 0 0 0 1px #3b171e, 3px 3px 0 #7d6036;
+}
+
+.nav-cta:hover {
+  color: var(--cabinet-ink) !important;
+  background: var(--cabinet-brass-light);
+}
+
+/* The catalogue reads like an inventory card from a private collection. */
+.market-page {
+  padding-top: 2.7rem;
+}
+
+.catalogue-meta {
+  margin-bottom: 1rem;
+  border-top: 3px double var(--cabinet-ink);
+  border-bottom-color: var(--cabinet-ink);
+  color: #5e4d3b;
+}
+
+.catalogue-meta::before,
+.catalogue-meta::after {
+  width: .42rem;
+  border: 1px solid var(--cabinet-oxblood);
+  background: transparent;
+  transform: rotate(45deg);
+}
+
+.catalogue-meta span:nth-child(2) {
+  color: var(--cabinet-oxblood);
+}
+
+.market-heading {
+  display: grid;
+  grid-template-areas:
+    "copy still"
+    "search still";
+  grid-template-columns: minmax(0, .92fr) minmax(380px, 1.08fr);
+  grid-template-rows: 1fr auto;
+  gap: 1.5rem 2.4rem;
+  min-height: 470px;
+  padding: clamp(2rem, 4vw, 3.7rem);
+  border: 1px solid #1c130e;
+  outline: 1px solid rgba(224, 197, 135, .52);
+  outline-offset: -10px;
+  background:
+    radial-gradient(circle at 74% 38%, rgba(184, 147, 82, .12), transparent 23rem),
+    linear-gradient(112deg, #351d17 0, #1b120e 48%, #0d0907 100%);
+  box-shadow: 10px 10px 0 rgba(104, 40, 51, .28);
+}
+
+.market-heading::before {
+  content: "";
+  display: block;
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent calc(50% - .5px), rgba(224, 197, 135, .16) 50%, transparent calc(50% + .5px)),
+    repeating-linear-gradient(0deg, transparent 0 31px, rgba(255, 255, 255, .016) 32px);
+  pointer-events: none;
+}
+
+.market-heading::after {
+  content: "";
+  position: absolute;
+  top: 1.35rem;
+  right: 1.35rem;
+  bottom: 1.35rem;
+  left: 1.35rem;
+  width: auto;
+  aspect-ratio: auto;
+  border: 1px solid rgba(224, 197, 135, .11);
+  border-radius: 0;
+  background: none;
+  transform: none;
+  pointer-events: none;
+}
+
+.market-heading > .hero-edition-mark {
+  top: auto;
+  right: auto;
+  bottom: 1.3rem;
+  left: 2rem;
+  color: rgba(224, 197, 135, .08);
+  font: 700 clamp(3.8rem, 8vw, 7rem)/1 var(--display-font);
+  letter-spacing: .08em;
+  transform: none;
+}
+
+.market-copy {
+  grid-area: copy;
+  align-self: end;
+  padding-top: .5rem;
+}
+
+.market-heading .eyebrow {
+  color: var(--cabinet-brass-light);
+}
+
+.market-heading .eyebrow::before {
+  background: linear-gradient(90deg, transparent, currentColor 28%);
+}
+
+.market-heading h1 {
+  max-width: 620px;
+  color: #fff4db;
+  font-size: clamp(3.25rem, 6vw, 6.2rem);
+  line-height: .9;
+  text-shadow: 0 3px 0 rgba(0, 0, 0, .28);
+}
+
+.market-deck {
+  max-width: 530px;
+  color: #cfbfa8;
+  font-size: 1.03rem;
+}
+
+.curio-still-life {
+  position: relative;
+  z-index: 1;
+  grid-area: still;
+  align-self: stretch;
+  min-width: 0;
+  margin: -1.5rem -1.3rem -1.5rem 0;
+  overflow: hidden;
+  border-left: 1px solid rgba(224, 197, 135, .2);
+  background: #0b0706;
+  isolation: isolate;
+}
+
+.curio-still-life::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(90deg, #18100d 0, rgba(24, 16, 13, .6) 8%, transparent 25%),
+    linear-gradient(0deg, rgba(10, 6, 5, .7), transparent 30%);
+  pointer-events: none;
+}
+
+.curio-still-life img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 430px;
+  object-fit: cover;
+  object-position: 52% center;
+  filter: saturate(.78) sepia(.12) contrast(1.06);
+  transform: scale(1.035);
+  transition: filter .7s ease, transform 1s cubic-bezier(.2, .8, .2, 1);
+}
+
+.market-heading:hover .curio-still-life img {
+  filter: saturate(.9) sepia(.05) contrast(1.08);
+  transform: scale(1.065);
+}
+
+.curio-still-life figcaption {
+  position: absolute;
+  right: 1.1rem;
+  bottom: 1rem;
+  z-index: 2;
+  display: flex;
+  align-items: baseline;
+  gap: .75rem;
+  color: #d8c49c;
+  font: 750 .65rem/1 var(--ui-font);
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+
+.curio-still-life figcaption strong {
+  color: #fff1cc;
+  font: italic 600 1.45rem/1 var(--display-font);
+  letter-spacing: 0;
+}
+
+.catalogue-search {
+  z-index: 2;
+  grid-area: search;
+  align-self: end;
+  padding: 1rem;
+  border: 1px solid rgba(184, 147, 82, .66);
+  color: var(--cabinet-ink);
+  background: rgba(255, 249, 236, .96);
+  box-shadow: inset 0 0 0 4px rgba(184, 147, 82, .13), 6px 6px 0 rgba(0, 0, 0, .3);
+}
+
+.catalogue-search::before,
+.catalogue-search::after {
+  border-color: var(--cabinet-oxblood);
+}
+
+.catalogue-search-label {
+  color: var(--cabinet-oxblood);
+}
+
+.search-bar {
+  border-color: #3a281e;
+  background: #fffdf7;
+  box-shadow: 4px 4px 0 rgba(104, 40, 51, .28);
+}
+
+.search-bar:focus-within {
+  box-shadow: 6px 6px 0 rgba(184, 147, 82, .52);
+}
+
+.search-bar button {
+  background: var(--cabinet-oxblood);
+}
+
+.search-bar button:hover {
+  background: var(--cabinet-walnut);
+}
+
+.search-bar select {
+  background: #fffdf7;
+}
+
+/* Lots resemble labeled drawers from the same cabinet. */
+.market-toolbar {
+  border-bottom-color: var(--cabinet-ink);
+}
+
+.catalogue-count strong,
+.market-toolbar .catalogue-count strong {
+  color: var(--cabinet-oxblood);
+}
+
+.filter-pills button {
+  border-color: #937852;
+  color: #4c3c2e;
+  background: #eee0c8;
+}
+
+.filter-pills .active {
+  border-color: var(--cabinet-oxblood);
+  color: #fff8e9;
+  background: var(--cabinet-oxblood);
+}
+
+.auction-card {
+  border-color: #8d704d;
+  background: #fffaf0;
+  box-shadow: 6px 7px 0 #8c704b;
+}
+
+.auction-card::before {
+  background: linear-gradient(90deg, transparent, rgba(184, 147, 82, .5), transparent);
+}
+
+.auction-card:hover {
+  box-shadow: 10px 13px 0 #654b31;
+}
+
+.card-image-link {
+  border-bottom-color: #2d1f17;
+  background: #17100c;
+}
+
+.record-cover {
+  filter: saturate(.72) contrast(1.04) sepia(.16);
+}
+
+.auction-card:hover .record-cover {
+  filter: saturate(.98) contrast(1.05) sepia(.03);
+}
+
+.lot-stamp {
+  border-color: var(--cabinet-brass-light);
+  color: #fff1c7;
+  background: rgba(40, 22, 16, .9);
+}
+
+.card-time,
+.category-tags li {
+  color: #69452f;
+}
+
+.category-tags li {
+  border-color: #a6875d;
+  background: #f1e4cd;
+}
+
+.card-body h2 a {
+  background-image: linear-gradient(var(--cabinet-oxblood), var(--cabinet-oxblood));
+}
+
+.card-catalogue-link {
+  color: var(--cabinet-oxblood);
+}
+
+.site-footer {
+  border-top: 3px double rgba(224, 197, 135, .54);
+  color: #d5c6ae;
+  background:
+    repeating-linear-gradient(92deg, rgba(255, 255, 255, .015) 0 1px, transparent 1px 20px),
+    #1d130f;
+}
+
+.site-footer::before {
+  background: var(--cabinet-oxblood-light);
+}
+
+.footer-brand strong,
+.site-footer a {
+  color: var(--cabinet-brass-light);
+}
+
+/* Invitation behavior is unchanged; only its period finish follows the new collection. */
+.invitation-intro::before {
+  background:
+    radial-gradient(circle at 50% 42%, rgba(184, 147, 82, .1), transparent 28%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, .018) 0 1px, transparent 1px 24px),
+    linear-gradient(145deg, #321c16, #120c09 72%);
+}
+
+.invitation-card {
+  border-color: #a37e43;
+  color: var(--cabinet-ink);
+  background:
+    radial-gradient(circle at 22% 18%, rgba(255, 255, 255, .72), transparent 13rem),
+    repeating-linear-gradient(0deg, rgba(88, 58, 31, .025) 0 1px, transparent 1px 5px),
+    #f1e2c4;
+}
+
+.invitation-ornament {
+  border-color: var(--cabinet-oxblood);
+  color: var(--cabinet-oxblood);
+  background: radial-gradient(circle, transparent 48%, rgba(104, 40, 51, .08) 49%);
+  clip-path: none;
+  transform: rotate(45deg);
+}
+
+.invitation-ornament::first-letter {
+  transform: rotate(-45deg);
+}
+
+.invitation-card em {
+  color: var(--cabinet-oxblood);
+}
+
+.invitation-rule {
+  background: linear-gradient(90deg, transparent, var(--cabinet-brass), transparent);
+}
+
+.wax-seal-half {
+  border-color: #3d1118;
+  background: radial-gradient(circle at 36% 30%, #a34c58, #682833 62%, #351018);
+}
+
+.session-alert {
+  background: var(--cabinet-oxblood);
+}
+
+@media (max-width: 1000px) {
+  .market-heading {
+    grid-template-columns: minmax(0, .9fr) minmax(330px, 1.1fr);
+    gap: 1.25rem;
+    padding: 2.2rem;
+  }
+
+  .market-heading h1 {
+    font-size: clamp(2.8rem, 6vw, 4.5rem);
+  }
+
+  .curio-still-life {
+    margin: -.7rem -.7rem -.7rem 0;
+  }
+}
+
+@media (max-width: 760px) {
+  .site-header {
+    min-height: 70px;
+  }
+
+  nav {
+    border-bottom: 1px solid var(--cabinet-brass);
+    background: var(--cabinet-walnut);
+  }
+
+  .market-page {
+    padding-top: 2rem;
+  }
+
+  .market-heading {
+    grid-template-areas:
+      "copy"
+      "still"
+      "search";
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    gap: 1.3rem;
+    min-height: 0;
+    padding: 1.5rem;
+  }
+
+  .market-heading::before {
+    background: repeating-linear-gradient(0deg, transparent 0 31px, rgba(255, 255, 255, .016) 32px);
+  }
+
+  .market-heading > .hero-edition-mark {
+    top: 1rem;
+    right: .5rem;
+    bottom: auto;
+    left: auto;
+    font-size: 3.2rem;
+  }
+
+  .market-copy {
+    padding: .6rem .35rem 0;
+  }
+
+  .market-heading h1 {
+    max-width: 540px;
+    font-size: clamp(2.75rem, 13vw, 4.7rem);
+  }
+
+  .curio-still-life {
+    min-height: 260px;
+    margin: 0;
+    border: 1px solid rgba(224, 197, 135, .25);
+  }
+
+  .curio-still-life img {
+    min-height: 260px;
+    object-position: center;
+  }
+
+  .catalogue-search {
+    margin: 0 .1rem .2rem;
+  }
+
+  .catalogue-meta span:nth-child(2) {
+    display: none;
+  }
+
+  .auction-card,
+  .auction-card:hover {
+    box-shadow: 6px 7px 0 #755839;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .curio-still-life img {
+    transform: none !important;
+  }
+}

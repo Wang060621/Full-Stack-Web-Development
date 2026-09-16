@@ -133,8 +133,8 @@ async function submit() {
   if (submitting.value || editing.value) return;
   error.value = '';
   notice.value = '';
-  if (!form.name.trim()) error.value = 'Enter the record name.';
-  else if (!form.description.trim()) error.value = 'Enter a description for the record.';
+  if (!form.name.trim()) error.value = 'Enter the object name.';
+  else if (!form.description.trim()) error.value = 'Enter a description for the object.';
   else if (!Number.isFinite(Number(form.starting_bid)) || Number(form.starting_bid) < 0) {
     error.value = 'Enter a starting bid of zero or more.';
   } else if (!Number.isSafeInteger(Number(form.starting_bid))) {
@@ -182,9 +182,9 @@ watch(() => route.query.draft, (draftId) => {
 <template>
   <section class="editor-page page-width">
     <div class="editor-intro">
-      <p class="eyebrow">{{ editing ? 'Edit page' : 'List a record' }}</p>
-      <h1>{{ editing ? 'Review the lot details' : 'Put your next record in motion' }}</h1>
-      <p v-if="!editing">Describe the pressing, condition and extras so collectors can bid with confidence.</p>
+      <p class="eyebrow">{{ editing ? 'Edit page' : 'List an object' }}</p>
+      <h1>{{ editing ? 'Review the lot details' : 'Open a new cabinet entry' }}</h1>
+      <p v-if="!editing">Describe its period, materials, condition and provenance so collectors can bid with confidence.</p>
     </div>
     <div v-if="loading" class="page-loader">Loading lot…</div>
     <div v-else class="editor-layout">
@@ -198,7 +198,7 @@ watch(() => route.query.draft, (draftId) => {
         <StatusPanel v-if="error" type="error" title="Unable to continue" :message="error" />
         <StatusPanel v-if="notice" type="success" title="Draft updated" :message="notice" />
         <label>
-          <span>Record name</span>
+          <span>Object name</span>
           <input v-model="form.name" maxlength="100" :disabled="editing" required />
         </label>
         <label>
@@ -208,7 +208,7 @@ watch(() => route.query.draft, (draftId) => {
             rows="7"
             maxlength="2000"
             :disabled="editing"
-            placeholder="Pressing, year, condition, extras and playback notes"
+            placeholder="Period, maker, materials, condition and provenance"
             required
           />
           <small>{{ form.description.length }} / 2000</small>

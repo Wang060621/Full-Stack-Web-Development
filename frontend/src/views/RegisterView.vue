@@ -63,8 +63,8 @@ async function submit() {
   <section class="auth-page page-width">
     <div class="auth-intro">
       <p class="eyebrow">Join GrooveGavel</p>
-      <h1>Help great records find their next collector</h1>
-      <p>You will be signed in automatically and can list your first record straight away.</p>
+      <h1>Give remarkable objects their next chapter</h1>
+      <p>You will be signed in automatically and can list your first object straight away.</p>
     </div>
     <form class="form-card" novalidate @submit.prevent="submit">
       <div class="form-heading">

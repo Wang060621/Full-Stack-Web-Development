@@ -40,7 +40,7 @@ async function submit() {
     <div class="auth-intro">
       <p class="eyebrow">Welcome back</p>
       <h1>Continue your collecting journey</h1>
-      <p>Sign in to list records, place bids, ask questions and track your auctions.</p>
+      <p>Sign in to list objects, place bids, ask questions and track your auctions.</p>
     </div>
     <form class="form-card" novalidate @submit.prevent="submit">
       <div class="form-heading">

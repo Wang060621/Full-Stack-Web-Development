@@ -112,13 +112,16 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
         );
 
         const defaultCategories = [
-            'Jazz',
-            'Rock',
-            'Soul & Funk',
-            'Electronic',
-            'Hip-Hop',
-            'Classical',
-            'Other'
+            'Timepieces',
+            'Photography',
+            'Writing & Print',
+            'Audio & Music',
+            'Optical',
+            'Travel',
+            'Maps & Globes',
+            'Mechanical Music',
+            'Decorative Arts',
+            'Scientific Instruments'
         ];
         const placeholders = defaultCategories.map(() => '(?)').join(', ');
         db.run(

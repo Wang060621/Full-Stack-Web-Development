@@ -18,7 +18,7 @@ const router = createRouter({
     { path: '/register', name: 'register', component: RegisterView, meta: { guestOnly: true, title: 'Create account' } },
     { path: '/welcome', name: 'welcome', component: WelcomeView, meta: { requiresAuth: true, title: 'Welcome' } },
     { path: '/profile/:id?', name: 'profile', component: ProfileView, meta: { title: 'Profile' } },
-    { path: '/items/new', name: 'item-new', component: ItemFormView, meta: { requiresAuth: true, title: 'List a record' } },
+    { path: '/items/new', name: 'item-new', component: ItemFormView, meta: { requiresAuth: true, title: 'List an object' } },
     { path: '/items/:id/edit', name: 'item-edit', component: ItemFormView, meta: { requiresAuth: true, title: 'Review lot' } },
     { path: '/items/:id', name: 'item-detail', component: ItemDetailView, meta: { title: 'Lot details' } },
     { path: '/:pathMatch(.*)*', name: 'not-found', component: NotFoundView }
@@ -27,7 +27,7 @@ const router = createRouter({
 
 router.afterEach((to) => {
   document.title = `${to.meta.title || 'Page not found'} · GrooveGavel`;
-  window.requestAnimationFrame(() => document.querySelector('#main-content')?.focus());
+  window.requestAnimationFrame(() => document.querySelector('#main-content')?.focus({ preventScroll: true }));
 });
 
 router.beforeEach((to) => {

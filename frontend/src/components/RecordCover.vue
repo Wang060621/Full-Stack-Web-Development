@@ -1,29 +1,44 @@
 <script setup>
 import { computed } from 'vue';
-import coverAtlas from '../assets/record-cover-atlas.png';
-import vinylFeature from '../assets/vinyl-placeholder.webp';
+import pocketWatch from '../assets/antiques/pocket-watch.jpg';
+import foldingCamera from '../assets/antiques/folding-camera.jpg';
+import typewriter from '../assets/antiques/typewriter.jpg';
+import valveRadio from '../assets/antiques/valve-radio.jpg';
+import operaGlasses from '../assets/antiques/opera-glasses.jpg';
+import travelTrunk from '../assets/antiques/travel-trunk.jpg';
+import terrestrialGlobe from '../assets/antiques/terrestrial-globe.jpg';
+import musicBox from '../assets/antiques/music-box.jpg';
+import porcelainTeaSet from '../assets/antiques/porcelain-tea-set.jpg';
+import brassCompass from '../assets/antiques/brass-compass.jpg';
+import gramophone from '../assets/antiques/gramophone.jpg';
 
 const props = defineProps({
   itemId: { type: [Number, String], required: true },
   alt: { type: String, default: '' }
 });
 
+const antiqueCovers = [
+  pocketWatch,
+  foldingCamera,
+  typewriter,
+  valveRadio,
+  operaGlasses,
+  travelTrunk,
+  terrestrialGlobe,
+  musicBox,
+  porcelainTeaSet,
+  brassCompass,
+  gramophone
+];
+
 const coverStyle = computed(() => {
-  const coverIndex = (Math.max(1, Math.abs(Number(props.itemId) || 1)) - 1) % 10;
-  if (coverIndex === 9) {
-    return {
-      backgroundImage: `url(${vinylFeature})`,
-      backgroundPosition: 'center',
-      backgroundSize: 'cover'
-    };
-  }
-  const column = coverIndex % 3;
-  const row = Math.floor(coverIndex / 3);
-  const positions = ['0%', '50%', '100%'];
+  const itemId = Math.max(1, Math.abs(Number(props.itemId) || 1));
+  const cover = antiqueCovers[(itemId - 1) % antiqueCovers.length];
 
   return {
-    backgroundImage: `url(${coverAtlas})`,
-    backgroundPosition: `${positions[column]} ${positions[row]}`
+    backgroundImage: `url(${cover})`,
+    backgroundPosition: 'center',
+    backgroundSize: 'cover'
   };
 });
 </script>
@@ -31,7 +46,7 @@ const coverStyle = computed(() => {
 <template>
   <span
     class="record-cover"
-    :class="`cover-${(Math.max(1, Math.abs(Number(itemId) || 1)) - 1) % 10}`"
+    :class="`cover-${(Math.max(1, Math.abs(Number(itemId) || 1)) - 1) % 11}`"
     :style="coverStyle"
     :role="alt ? 'img' : undefined"
     :aria-label="alt || undefined"

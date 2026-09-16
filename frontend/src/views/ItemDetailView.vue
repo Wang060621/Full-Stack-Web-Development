@@ -123,7 +123,7 @@ watch(() => route.params.id, loadItem);
     <template v-else-if="item">
       <div class="detail-hero">
         <div class="detail-image-wrap">
-          <RecordCover :item-id="item.item_id" :alt="`Cover artwork for ${item.name}`" />
+          <RecordCover :item-id="item.item_id" :alt="`Photograph of ${item.name}`" />
           <span class="lot-number">LOT {{ item.item_id }}</span>
         </div>
         <div class="detail-summary">

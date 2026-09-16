@@ -124,9 +124,9 @@ async function logout() {
             >
               <span class="invitation-kicker">Private invitation</span>
               <span class="invitation-ornament">G</span>
-              <strong>Welcome to a<br /><em>Vinyl Lover’s Paradise</em></strong>
+              <strong>Welcome to a<br /><em>Cabinet of Curious Things</em></strong>
               <span class="invitation-rule" />
-              <small>GrooveGavel · Autumn catalogue · 1992</small>
+              <small>GrooveGavel · Private collection · 1992</small>
             </button>
             <span class="envelope-pocket" />
             <span class="envelope-flap" />
@@ -157,7 +157,7 @@ async function logout() {
         <span class="brand-mark" aria-hidden="true">G</span>
         <span>
           <strong>GrooveGavel</strong>
-          <small>VINYL AUCTION HOUSE</small>
+          <small>COLLECTORS’ AUCTION HOUSE</small>
         </span>
       </RouterLink>
 
@@ -174,7 +174,7 @@ async function logout() {
       <nav id="main-navigation" :class="{ open: menuOpen }" aria-label="Main navigation">
         <RouterLink to="/" @click="menuOpen = false">Marketplace</RouterLink>
         <template v-if="authStore.isAuthenticated">
-          <RouterLink to="/items/new" @click="menuOpen = false">Sell a record</RouterLink>
+          <RouterLink to="/items/new" @click="menuOpen = false">List an object</RouterLink>
           <RouterLink :to="`/profile/${authStore.state.userId}`" @click="menuOpen = false">Profile</RouterLink>
           <button class="nav-button" type="button" :disabled="loggingOut" @click="logout">
             {{ loggingOut ? 'Signing out…' : 'Sign out' }}
@@ -210,8 +210,8 @@ async function logout() {
     </main>
 
     <footer class="site-footer">
-      <p><strong>GrooveGavel</strong> · Rare grooves. Fair bids.</p>
-      <span class="footer-edition">ARCHIVE EDITION · 1988–1999</span>
+      <p class="footer-brand"><strong>GrooveGavel</strong><span>Old things. New stories.</span></p>
+      <span class="footer-edition">Catalogue No. 09 · The collector’s edition · 1992</span>
       <RouterLink to="/">Back to marketplace</RouterLink>
     </footer>
   </div>

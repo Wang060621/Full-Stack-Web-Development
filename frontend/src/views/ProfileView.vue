@@ -49,7 +49,7 @@ watch(requestedId, loadProfile);
           <h1>{{ profile.first_name }} {{ profile.last_name }}</h1>
           <p>Member #{{ profile.user_id }}</p>
         </div>
-        <RouterLink v-if="isOwnProfile" class="primary-button inline-button" to="/items/new">List a record</RouterLink>
+        <RouterLink v-if="isOwnProfile" class="primary-button inline-button" to="/items/new">List an object</RouterLink>
       </header>
 
       <section class="profile-section">

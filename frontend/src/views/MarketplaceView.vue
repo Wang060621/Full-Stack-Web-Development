@@ -4,6 +4,7 @@ import AuctionCard from '../components/AuctionCard.vue';
 import StatusPanel from '../components/StatusPanel.vue';
 import { apiRequest } from '../services/api';
 import { authStore } from '../stores/auth';
+import curioCabinetHero from '../assets/curio-cabinet-hero.png';
 
 const items = ref([]);
 const loading = ref(true);
@@ -89,23 +90,38 @@ onBeforeUnmount(() => controller?.abort());
 
 <template>
   <section class="market-page page-width">
+    <div class="catalogue-meta" aria-label="Catalogue edition">
+      <span>The Collector’s Cabinet · No. 09</span>
+      <span>London · Autumn 1992</span>
+      <span>Sound · Time · Memory</span>
+    </div>
     <div class="market-heading">
-      <div>
-        <p class="eyebrow">Rare pressings · Autumn ’92</p>
-        <h1>Records worth keeping.</h1>
+      <span class="hero-edition-mark" aria-hidden="true">ARCHIVE</span>
+      <div class="market-copy">
+        <p class="eyebrow">The collector’s cabinet · Autumn ’92</p>
+        <h1>Every object keeps a story.</h1>
+        <p class="market-deck">A private catalogue of sound, time and memory—kept for those who notice the beauty of things made to last.</p>
       </div>
-      <form class="search-bar" role="search" novalidate @submit.prevent="loadItems({ reset: true })">
-        <label class="sr-only" for="market-search">Search records</label>
-        <input id="market-search" v-model="query" maxlength="100" placeholder="Search name or description" />
-        <label class="sr-only" for="category-filter">Filter by category</label>
-        <select id="category-filter" v-model="activeCategory" @change="loadItems({ reset: true })">
-          <option value="">All categories</option>
-          <option v-for="category in categories" :key="category.category_id" :value="String(category.category_id)">
-            {{ category.name }}
-          </option>
-        </select>
-        <button type="submit">Search</button>
-      </form>
+      <figure class="curio-still-life" aria-label="A collection of vintage objects including a record and pocket watch">
+        <img :src="curioCabinetHero" alt="Vintage record, pocket watch, opera glasses, books, fountain pen and old key" />
+        <figcaption><span>Cabinet study</span><strong>No. 09</strong></figcaption>
+      </figure>
+      <div class="catalogue-search">
+        <span class="catalogue-search-label">Search the cabinet</span>
+        <form class="search-bar" role="search" novalidate @submit.prevent="loadItems({ reset: true })">
+          <label class="sr-only" for="market-search">Search objects</label>
+          <input id="market-search" v-model="query" maxlength="100" placeholder="Object, maker or period" />
+          <label class="sr-only" for="category-filter">Filter by category</label>
+          <select id="category-filter" v-model="activeCategory" @change="loadItems({ reset: true })">
+            <option value="">All categories</option>
+            <option v-for="category in categories" :key="category.category_id" :value="String(category.category_id)">
+              {{ category.name }}
+            </option>
+          </select>
+          <button type="submit">Search</button>
+        </form>
+        <span class="catalogue-search-note">Browse the current house collection</span>
+      </div>
     </div>
 
     <div class="market-toolbar">

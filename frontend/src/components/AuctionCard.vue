@@ -26,6 +26,9 @@ defineProps({
         <li v-for="category in item.categories" :key="category.category_id">{{ category.name }}</li>
       </ul>
       <p class="seller">Offered by {{ item.first_name }} {{ item.last_name }}</p>
+      <span class="card-catalogue-link" aria-hidden="true">
+        Open catalogue entry <span>↗</span>
+      </span>
       <RouterLink
         v-if="currentUserId === item.creator_id"
         class="edit-link"
