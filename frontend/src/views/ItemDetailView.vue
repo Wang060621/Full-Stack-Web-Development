@@ -118,12 +118,27 @@ watch(() => route.params.id, loadItem);
 
 <template>
   <section class="detail-page page-width">
-    <div v-if="loading" class="page-loader">Loading lot…</div>
-    <StatusPanel v-else-if="error" type="error" title="Unable to load lot" :message="error" />
+    <div v-if="loading" class="detail-loading" role="status" aria-label="Loading lot">
+      <span class="detail-loading-image" aria-hidden="true" />
+      <div aria-hidden="true">
+        <span class="skeleton-line skeleton-line-short" />
+        <span class="skeleton-line skeleton-line-heading" />
+        <span class="skeleton-line" />
+        <span class="skeleton-line" />
+      </div>
+    </div>
+    <StatusPanel
+      v-else-if="error"
+      type="error"
+      title="Unable to load lot"
+      :message="error"
+      action-label="Try again"
+      @action="loadItem"
+    />
     <template v-else-if="item">
       <div class="detail-hero">
         <div class="detail-image-wrap">
-          <RecordCover :item-id="item.item_id" :alt="`Photograph of ${item.name}`" />
+          <RecordCover :item-id="item.item_id" :alt="`Photograph of ${item.name}`" eager />
           <span class="lot-number">LOT {{ item.item_id }}</span>
         </div>
         <div class="detail-summary">
@@ -136,6 +151,7 @@ watch(() => route.params.id, loadItem);
           <dl class="bid-facts">
             <div><dt>Current price</dt><dd>{{ formatCurrency(item.current_bid) }}</dd></div>
             <div><dt>Starting bid</dt><dd>{{ formatCurrency(item.starting_bid) }}</dd></div>
+            <div><dt>Total bids</dt><dd>{{ bids.length }}</dd></div>
             <div><dt>Ends</dt><dd>{{ formatDate(item.end_date) }}</dd></div>
           </dl>
           <p class="seller-line">

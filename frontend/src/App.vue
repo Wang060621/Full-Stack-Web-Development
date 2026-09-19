@@ -175,7 +175,7 @@ async function logout() {
         <RouterLink to="/" @click="menuOpen = false">Marketplace</RouterLink>
         <template v-if="authStore.isAuthenticated">
           <RouterLink to="/items/new" @click="menuOpen = false">List an object</RouterLink>
-          <RouterLink :to="`/profile/${authStore.state.userId}`" @click="menuOpen = false">Profile</RouterLink>
+          <RouterLink :to="`/profile/${authStore.state.userId}`" @click="menuOpen = false">My account</RouterLink>
           <button class="nav-button" type="button" :disabled="loggingOut" @click="logout">
             {{ loggingOut ? 'Signing out…' : 'Sign out' }}
           </button>

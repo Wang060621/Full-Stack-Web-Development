@@ -70,10 +70,14 @@ describe("Searching with no criteria, and no authentication, to test pagination.
             .then((res) => {
                 expect(res).to.have.status(200)
                 expect(res.body.length).to.equal(10)
+                expect(res).to.have.header('x-total-count', '10')
 
                 expect(res.body[0]).to.have.property("item_id")
                 expect(res.body[0]).to.have.property("name")
                 expect(res.body[0]).to.have.property("description")
+                expect(res.body[0]).to.have.property("starting_bid")
+                expect(res.body[0]).to.have.property("current_bid")
+                expect(res.body[0]).to.have.property("bid_count")
                 expect(res.body[0]).to.have.property("end_date")
                 expect(res.body[0]).to.have.property("creator_id")
                 expect(res.body[0]).to.have.property("first_name")

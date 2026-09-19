@@ -2,8 +2,11 @@
 defineProps({
   type: { type: String, default: 'info' },
   title: { type: String, required: true },
-  message: { type: String, default: '' }
+  message: { type: String, default: '' },
+  actionLabel: { type: String, default: '' }
 });
+
+defineEmits(['action']);
 </script>
 
 <template>
@@ -16,5 +19,13 @@ defineProps({
     <strong>{{ title }}</strong>
     <span v-if="message">{{ message }}</span>
     <slot />
+    <button
+      v-if="actionLabel"
+      class="status-action"
+      type="button"
+      @click="$emit('action')"
+    >
+      {{ actionLabel }}
+    </button>
   </div>
 </template>

@@ -151,11 +151,16 @@ const search = async (req, res) => {
     }
 
     try {
-        const results = await items.searchItems({
+        const searchOptions = {
             ...value,
             userId: authenticatedUser?.user_id,
             now: Date.now()
-        });
+        };
+        const [results, totalCount] = await Promise.all([
+            items.searchItems(searchOptions),
+            items.countSearchItems(searchOptions)
+        ]);
+        res.set('X-Total-Count', String(totalCount));
         return successResponse(res, 200, results);
     } catch (err) {
         console.error('Failed to search items:', err.message);

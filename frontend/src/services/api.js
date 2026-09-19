@@ -14,7 +14,14 @@ export function onAuthenticationFailure(handler) {
   authenticationFailureHandler = handler;
 }
 
-export async function apiRequest(path, { method = 'GET', body, token, signal, ignoreAuthenticationFailure = false } = {}) {
+export async function apiRequest(path, {
+  method = 'GET',
+  body,
+  token,
+  signal,
+  ignoreAuthenticationFailure = false,
+  includeResponse = false
+} = {}) {
   const headers = { Accept: 'application/json' };
   if (body !== undefined) headers['Content-Type'] = 'application/json';
   if (token) headers['X-Authorization'] = token;
@@ -49,7 +56,7 @@ export async function apiRequest(path, { method = 'GET', body, token, signal, ig
     }
     throw new ApiError(payload?.error_message || `Request failed (${response.status})`, response.status);
   }
-  return payload;
+  return includeResponse ? { data: payload, response } : payload;
 }
 
 export { API_URL };

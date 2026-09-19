@@ -11,6 +11,7 @@ const route = useRoute();
 const router = useRouter();
 const editing = computed(() => route.name === 'item-edit');
 const form = reactive({ name: '', description: '', starting_bid: 0, end_date: '', category_ids: [] });
+const endDateFields = reactive({ date: '', time: '' });
 const loading = ref(editing.value);
 const submitting = ref(false);
 const error = ref('');
@@ -20,8 +21,50 @@ const categoryError = ref('');
 const drafts = ref([]);
 const activeDraftId = ref('');
 
+function splitEndDate(value) {
+  const match = String(value || '').match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+  if (!match) return { date: '', time: '' };
+  return { date: `${match[3]} / ${match[2]} / ${match[1]}`, time: `${match[4]} : ${match[5]}` };
+}
+
+function parseEndDate() {
+  const dateMatch = endDateFields.date.match(/^\s*(\d{2})\s*\/\s*(\d{2})\s*\/\s*(\d{4})\s*$/);
+  const timeMatch = endDateFields.time.match(/^\s*(\d{2})\s*:\s*(\d{2})\s*$/);
+  if (!dateMatch || !timeMatch) return Number.NaN;
+
+  const [, dayText, monthText, yearText] = dateMatch;
+  const [, hourText, minuteText] = timeMatch;
+  const day = Number(dayText);
+  const month = Number(monthText);
+  const year = Number(yearText);
+  const hour = Number(hourText);
+  const minute = Number(minuteText);
+  const date = new Date(year, month - 1, day, hour, minute, 0, 0);
+
+  if (
+    date.getFullYear() !== year
+    || date.getMonth() !== month - 1
+    || date.getDate() !== day
+    || date.getHours() !== hour
+    || date.getMinutes() !== minute
+  ) return Number.NaN;
+  return date.getTime();
+}
+
+function updateEndDateField(field, value) {
+  endDateFields[field] = value;
+  const timestamp = parseEndDate();
+  form.end_date = Number.isFinite(timestamp) ? toDateTimeLocal(timestamp) : '';
+}
+
+function setEndDate(value) {
+  form.end_date = value || '';
+  Object.assign(endDateFields, splitEndDate(form.end_date));
+}
+
 function clearForm() {
   Object.assign(form, { name: '', description: '', starting_bid: 0, end_date: '', category_ids: [] });
+  Object.assign(endDateFields, { date: '', time: '' });
   activeDraftId.value = '';
   notice.value = '';
   if (!editing.value && route.query.draft) router.replace({ name: 'item-new' });
@@ -55,7 +98,7 @@ async function loadItem() {
     form.name = item.name;
     form.description = item.description;
     form.starting_bid = item.starting_bid;
-    form.end_date = toDateTimeLocal(item.end_date);
+    setEndDate(toDateTimeLocal(item.end_date));
     form.category_ids = item.categories?.map((category) => category.category_id) || [];
   } catch (requestError) {
     error.value = requestError.message;
@@ -77,6 +120,7 @@ function openDraft(draftId) {
     end_date: draft.end_date,
     category_ids: [...draft.category_ids]
   });
+  setEndDate(draft.end_date);
   activeDraftId.value = draft.id;
   error.value = '';
   notice.value = `Draft “${draft.name || 'Untitled lot'}” is ready to edit.`;
@@ -139,9 +183,11 @@ async function submit() {
     error.value = 'Enter a starting bid of zero or more.';
   } else if (!Number.isSafeInteger(Number(form.starting_bid))) {
     error.value = 'Enter a whole-number starting bid.';
-  } else if (!form.end_date || !Number.isFinite(new Date(form.end_date).getTime())) {
+  }
+  const endTimestamp = parseEndDate();
+  if (!error.value && !Number.isFinite(endTimestamp)) {
     error.value = 'Choose a valid auction end date and time.';
-  } else if (new Date(form.end_date).getTime() <= Date.now()) {
+  } else if (!error.value && endTimestamp <= Date.now()) {
     error.value = 'Choose an auction end time in the future.';
   }
   if (error.value) return;
@@ -155,7 +201,7 @@ async function submit() {
         name: form.name.trim(),
         description: form.description.trim(),
         starting_bid: Number(form.starting_bid),
-        end_date: new Date(form.end_date).getTime(),
+        end_date: endTimestamp,
         category_ids: [...form.category_ids]
       }
     });
@@ -231,9 +277,41 @@ watch(() => route.query.draft, (draftId) => {
             <span>Starting bid (GBP)</span>
             <input v-model.number="form.starting_bid" type="number" min="0" step="1" :disabled="editing" required />
           </label>
-          <label>
+          <label class="end-date-field">
             <span>End date and time</span>
-            <input v-model="form.end_date" type="datetime-local" :disabled="editing" required />
+            <span class="end-date-control">
+              <span class="end-date-segment">
+                <small>Date</small>
+                <input
+                  :value="endDateFields.date"
+                  type="text"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  maxlength="14"
+                  placeholder="DD / MM / YYYY"
+                  aria-label="Auction end date, day month year"
+                  :disabled="editing"
+                  required
+                  @input="updateEndDateField('date', $event.target.value)"
+                />
+              </span>
+              <span class="end-date-segment end-time-segment">
+                <small>Time</small>
+                <input
+                  :value="endDateFields.time"
+                  type="text"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  maxlength="7"
+                  placeholder="HH : MM"
+                  aria-label="Auction end time, 24 hour clock"
+                  :disabled="editing"
+                  required
+                  @input="updateEndDateField('time', $event.target.value)"
+                />
+              </span>
+            </span>
+            <small class="field-note">UK format · 24-hour clock · local time</small>
           </label>
         </div>
         <div v-if="!editing" class="editor-actions">

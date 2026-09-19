@@ -99,9 +99,26 @@ const getUserProfile = async (req, res) => {
     }
 };
 
+const getUserBidHistory = async (req, res) => {
+    const userId = parsePositiveId(req.params.user_id);
+    if (!userId) return errorResponse(res, 404, 'User not found');
+    if (req.authenticatedUser.user_id !== userId) {
+        return errorResponse(res, 403, 'You can only view your own bid history');
+    }
+
+    try {
+        const history = await users.getUserBidHistory(userId);
+        return successResponse(res, 200, history);
+    } catch (err) {
+        console.error('Failed to get user bid history:', err.message);
+        return errorResponse(res, 500, 'Internal server error');
+    }
+};
+
 module.exports = {
     createUser,
     login,
     logout,
-    getUserProfile
+    getUserProfile,
+    getUserBidHistory
 };

@@ -710,8 +710,11 @@ main { overflow: clip; }
   inset: 0;
   z-index: 220;
   display: grid;
-  place-items: center;
-  overflow: hidden;
+  align-items: safe center;
+  justify-items: center;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: clamp(1rem, 3vh, 2rem);
   background: transparent;
   perspective: 1500px;
   isolation: isolate;
@@ -724,9 +727,10 @@ main { overflow: clip; }
   will-change: opacity;
 }
 .invitation-scene {
+  --invitation-card-lift: -42%;
   position: relative;
   z-index: 1;
-  width: min(680px, 84vw);
+  width: min(680px, 84vw, calc((100dvh - 7rem) * 1.58));
   aspect-ratio: 1.58;
   perspective: 1500px;
   will-change: transform, opacity;
@@ -1056,9 +1060,44 @@ main { overflow: clip; }
 @keyframes invitation-card-present {
   0%, 35% { z-index: 2; opacity: 0; transform: translate3d(0, 0, 0) scale(.96); }
   42% { z-index: 2; opacity: 1; transform: translate3d(0, 0, 0) scale(.96); }
-  68% { z-index: 2; opacity: 1; transform: translate3d(0, -88%, 0) scale(1); }
-  76% { z-index: 7; opacity: 1; transform: translate3d(0, -88%, 0) scale(1); }
+  68% { z-index: 2; opacity: 1; transform: translate3d(0, var(--invitation-card-lift), 0) scale(1); }
+  76% { z-index: 7; opacity: 1; transform: translate3d(0, var(--invitation-card-lift), 0) scale(1); }
   100% { z-index: 12; opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@media (max-height: 720px) {
+  .invitation-scene {
+    --invitation-card-lift: -32%;
+  }
+}
+
+@media (max-height: 620px) {
+  .invitation-scene {
+    --invitation-card-lift: -24%;
+  }
+}
+
+@media (max-height: 520px) {
+  .invitation-scene {
+    --invitation-card-lift: -16%;
+  }
+
+  .invitation-card {
+    padding: .9rem;
+  }
+
+  .invitation-ornament {
+    width: 2.25rem;
+    margin: .45rem 0 .55rem;
+  }
+
+  .invitation-card strong {
+    font-size: clamp(1.1rem, 4vw, 1.55rem);
+  }
+
+  .invitation-rule {
+    margin: .6rem 0 .5rem;
+  }
 }
 @keyframes envelope-pocket-away {
   0%, 64% { opacity: 1; transform: translate3d(0,0,0); }
@@ -1448,6 +1487,79 @@ nav a:hover::after, .nav-button:hover::after {
 .draft-list small { color: var(--muted); }
 .draft-actions { display: flex; gap: .8rem; }
 .danger-button { color: #8a1f2d; }
+
+.end-date-field {
+  min-width: 0;
+}
+
+.form-row > label {
+  align-content: start;
+}
+
+.end-date-control {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(7.5rem, .62fr);
+  width: 100%;
+  height: 49px;
+  min-height: 49px;
+  border: 1px solid #83704e;
+  background: #fffdf6;
+  box-shadow: inset 3px 3px 0 rgba(77, 55, 31, .055);
+  transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
+}
+
+.end-date-control:hover,
+.end-date-control:focus-within {
+  border-color: var(--deco-emerald);
+}
+
+.end-date-control:focus-within {
+  background: #fffdf7;
+  box-shadow: inset 4px 0 0 var(--deco-emerald);
+}
+
+.form-card .end-date-segment {
+  display: grid;
+  align-content: center;
+  gap: .16rem;
+  min-width: 0;
+  padding: .32rem .8rem;
+}
+
+.form-card .end-date-segment + .end-date-segment {
+  border-left: 1px solid rgba(131, 112, 78, .58);
+}
+
+.form-card .end-date-segment small {
+  color: var(--muted);
+  font: 800 .52rem/1 Arial, Helvetica, sans-serif;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.form-card .end-date-segment input {
+  width: 100%;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  color: var(--ink);
+  background: transparent;
+  box-shadow: none;
+  font: 600 .94rem/1.1 Georgia, 'Times New Roman', serif;
+}
+
+.form-card .end-date-segment input::placeholder {
+  color: #9a8f7f;
+  opacity: 1;
+}
+
+.form-card .field-note {
+  color: var(--muted);
+  font: 700 .62rem/1.4 Arial, Helvetica, sans-serif;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
 
 @media (max-width: 900px) {
   .editor-layout { grid-template-columns: 1fr; }

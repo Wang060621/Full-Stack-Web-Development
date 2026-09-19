@@ -104,15 +104,18 @@ const itemSummarySql = `
         i.item_id,
         i.name,
         i.description,
+        i.starting_bid,
         i.end_date,
         i.creator_id,
         u.first_name,
         u.last_name,
+        COALESCE((SELECT MAX(b.amount) FROM bids b WHERE b.item_id = i.item_id), i.starting_bid) AS current_bid,
+        (SELECT COUNT(*) FROM bids b WHERE b.item_id = i.item_id) AS bid_count,
         ${categoryColumns}
     FROM items i
     JOIN users u ON u.user_id = i.creator_id`;
 
-const searchItems = ({ q, status, category_id, limit, offset, userId, now }) => {
+const buildSearchCriteria = ({ q, status, category_id, userId, now }) => {
     const joins = [];
     const conditions = [];
     const params = [];
@@ -144,17 +147,35 @@ const searchItems = ({ q, status, category_id, limit, offset, userId, now }) => 
         params.push(category_id);
     }
 
-    const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
-    params.push(limit, offset);
+    return {
+        joins: joins.join('\n'),
+        where: conditions.length ? `WHERE ${conditions.join(' AND ')}` : '',
+        params
+    };
+};
+
+const searchItems = ({ limit, offset, ...filters }) => {
+    const { joins, where, params } = buildSearchCriteria(filters);
 
     return all(
         `${itemSummarySql}
-         ${joins.join('\n')}
+         ${joins}
          ${where}
          ORDER BY i.item_id ASC
          LIMIT ? OFFSET ?`,
-        params
+        [...params, limit, offset]
     ).then((rows) => rows.map(attachCategories));
+};
+
+const countSearchItems = (filters) => {
+    const { joins, where, params } = buildSearchCriteria(filters);
+    return get(
+        `SELECT COUNT(DISTINCT i.item_id) AS total
+         FROM items i
+         ${joins}
+         ${where}`,
+        params
+    ).then((row) => row.total);
 };
 
 module.exports = {
@@ -162,5 +183,6 @@ module.exports = {
     getItemById,
     getBidHistory,
     addBidIfHighest,
-    searchItems
+    searchItems,
+    countSearchItems
 };

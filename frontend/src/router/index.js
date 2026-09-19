@@ -17,7 +17,7 @@ const router = createRouter({
     { path: '/login', name: 'login', component: LoginView, meta: { guestOnly: true, title: 'Sign in' } },
     { path: '/register', name: 'register', component: RegisterView, meta: { guestOnly: true, title: 'Create account' } },
     { path: '/welcome', name: 'welcome', component: WelcomeView, meta: { requiresAuth: true, title: 'Welcome' } },
-    { path: '/profile/:id?', name: 'profile', component: ProfileView, meta: { title: 'Profile' } },
+    { path: '/profile/:id?', name: 'profile', component: ProfileView, meta: { title: 'My account' } },
     { path: '/items/new', name: 'item-new', component: ItemFormView, meta: { requiresAuth: true, title: 'List an object' } },
     { path: '/items/:id/edit', name: 'item-edit', component: ItemFormView, meta: { requiresAuth: true, title: 'Review lot' } },
     { path: '/items/:id', name: 'item-detail', component: ItemDetailView, meta: { title: 'Lot details' } },
